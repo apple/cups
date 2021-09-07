@@ -140,7 +140,7 @@ static const char	*appleLangDefault(void);
 #      else
 #        define CF_RETURNS_RETAINED
 #      endif /* __has_feature(attribute_cf_returns_retained) */
-#    endif /* !CF_RETURNED_RETAINED */
+#    endif /* CF_RETURNS_RETAINED */
 static cups_array_t	*appleMessageLoad(const char *locale) CF_RETURNS_RETAINED;
 #  endif /* CUPS_BUNDLEDIR */
 #endif /* __APPLE__ */
@@ -198,8 +198,8 @@ _cupsAppleLanguage(const char *locale,	/* I - Locale ID */
 	  */
 
 	  language[2] = '_';
-	  language[3] = (char)toupper(language[3] & 255);
-	  language[4] = (char)toupper(language[4] & 255);
+	  language[3] = (char)toupper(language[3]);
+	  language[4] = (char)toupper(language[4]);
 	}
 	break;
   }
@@ -669,7 +669,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       if (*language == '_' || *language == '-' || *language == '.')
 	break;
       else if (ptr < (langname + sizeof(langname) - 1))
-        *ptr++ = (char)tolower(*language & 255);
+        *ptr++ = (char)tolower(*language);
 
     *ptr = '\0';
 
@@ -683,7 +683,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 	if (*language == '.')
 	  break;
 	else if (ptr < (country + sizeof(country) - 1))
-          *ptr++ = (char)toupper(*language & 255);
+          *ptr++ = (char)toupper(*language);
 
       *ptr = '\0';
 
@@ -705,7 +705,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
       for (language ++, ptr = charset; *language; language ++)
         if (_cups_isalnum(*language) && ptr < (charset + sizeof(charset) - 1))
-          *ptr++ = (char)toupper(*language & 255);
+          *ptr++ = (char)toupper(*language);
 
       *ptr = '\0';
     }
@@ -1027,11 +1027,10 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
 	    * Translation is empty, don't add it... (STR #4033)
 	    */
 
-	    free(m->msg);
-	    if (m->str)
-	      free(m->str);
-	    free(m);
-	  }
+     free(m->msg);
+     free(m->str);
+     free(m);
+    }
 	}
 
        /*
@@ -1059,8 +1058,7 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
 
 	if ((temp = realloc(m->str ? m->str : m->msg, length + ptrlen + 1)) == NULL)
 	{
-	  if (m->str)
-	    free(m->str);
+	  free(m->str);
 	  free(m->msg);
 	  free(m);
 	  m = NULL;
@@ -1125,8 +1123,7 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
 	*/
 
 	free(m->msg);
-	if (m->str)
-	  free(m->str);
+	free(m->str);
 	free(m);
       }
     }
@@ -1662,11 +1659,9 @@ cups_message_compare(
 static void
 cups_message_free(_cups_message_t *m)	/* I - Message */
 {
-  if (m->msg)
-    free(m->msg);
+  free(m->msg);
 
-  if (m->str)
-    free(m->str);
+  free(m->str);
 
   free(m);
 }
@@ -1784,7 +1779,7 @@ cups_read_strings(cups_file_t  *fp,	/* I - .strings file */
     *   "message" = "translation";
     */
 
-    for (bufptr = buffer; *bufptr && isspace(*bufptr & 255); bufptr ++);
+    for (bufptr = buffer; *bufptr && isspace(*bufptr); bufptr ++);
 
     if (*bufptr != '\"')
       continue;
@@ -1810,14 +1805,14 @@ cups_read_strings(cups_file_t  *fp,	/* I - .strings file */
     * Find the start of the translation...
     */
 
-    while (*bufptr && isspace(*bufptr & 255))
+    while (*bufptr && isspace(*bufptr))
       bufptr ++;
 
     if (*bufptr != '=')
       continue;
 
     bufptr ++;
-    while (*bufptr && isspace(*bufptr & 255))
+    while (*bufptr && isspace(*bufptr))
       bufptr ++;
 
     if (*bufptr != '\"')
@@ -1856,11 +1851,9 @@ cups_read_strings(cups_file_t  *fp,	/* I - .strings file */
     }
     else
     {
-      if (m->msg)
-	free(m->msg);
+      free(m->msg);
 
-      if (m->str)
-	free(m->str);
+      free(m->str);
 
       free(m);
       break;

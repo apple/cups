@@ -142,7 +142,7 @@ main(int  argc,				/* I - Number of command-line arguments */
         strlcpy(resource, "/ipp/print", sizeof(resource));
       }
     }
-    else if (!port && (argv[i][0] == '=' || isdigit(argv[i][0] & 255)))
+    else if (!port && (argv[i][0] == '=' || isdigit(argv[i][0])))
     {
       if (argv[i][0] == '=')
 	port = atoi(argv[i] + 1);

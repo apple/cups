@@ -25,13 +25,10 @@ ppdcString::ppdcString(const char *v)	// I - String
 
   if (v)
   {
-    size_t vlen = strlen(v);
-
-    value = new char[vlen + 1];
-    memcpy(value, v, vlen + 1);
+    value = strdup(v);
   }
   else
-    value = 0;
+    value = NULL;
 }
 
 
@@ -42,7 +39,5 @@ ppdcString::ppdcString(const char *v)	// I - String
 ppdcString::~ppdcString()
 {
   PPDC_DELETEVAL(value);
-
-  if (value)
-    delete[] value;
+  free(value);
 }

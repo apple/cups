@@ -243,7 +243,7 @@ cupsAdminGetServerSettings(
 
 	if ((port = strrchr(value, ':')) != NULL)
 	  *port = '\0';
-	else if (isdigit(*value & 255))
+	else if (isdigit(*value))
 	{
 	 /*
 	  * Listen on a port number implies remote access...
@@ -260,7 +260,7 @@ cupsAdminGetServerSettings(
 #ifdef AF_INET6
             && strcmp(value, "[::1]")
 #endif /* AF_INET6 */
-	    )
+	   )
 	  remote_access = 1;
       }
       else if (!_cups_strcasecmp(line, "Browsing"))
@@ -335,7 +335,7 @@ cupsAdminGetServerSettings(
 #ifdef AF_INET6
 	       && strcmp(value, "::1")
 #endif /* AF_INET6 */
-	       )
+	      )
       {
         if (in_admin_location)
 	  remote_admin = 1;
@@ -729,7 +729,7 @@ cupsAdminSetServerSettings(
 #ifdef CUPS_DEFAULT_DOMAINSOCKET
                && strcmp(CUPS_DEFAULT_DOMAINSOCKET, value)
 #endif /* CUPS_DEFAULT_DOMAINSOCKET */
-               )
+              )
         cupsFilePrintf(temp, "Listen %s\n", value);
     }
     else if ((!_cups_strcasecmp(line, "Browsing") ||

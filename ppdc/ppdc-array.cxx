@@ -102,10 +102,10 @@ ppdcArray::first()
 {
   current = 0;
 
-  if (current >= count)
-    return (0);
-  else
+  if (current < count)
     return (data[current ++]);
+  else
+    return (0);
 }
 
 
@@ -116,10 +116,10 @@ ppdcArray::first()
 ppdcShared *
 ppdcArray::next()
 {
-  if (current >= count)
-    return (0);
-  else
+  if (current < count)
     return (data[current ++]);
+  else
+    return (0);
 }
 
 

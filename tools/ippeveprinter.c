@@ -588,7 +588,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  case 'p' : /* -p port */
 	      i ++;
-	      if (i >= argc || !isdigit(argv[i][0] & 255))
+	      if (i >= argc || !isdigit(argv[i][0]))
 	        usage(1);
 
 	      serverport = atoi(argv[i]);
@@ -776,7 +776,7 @@ authenticate_request(
   }
 
   authorization += 5;
-  while (isspace(*authorization & 255))
+  while (isspace(*authorization))
     authorization ++;
 
   userlen = sizeof(data.username);
@@ -1244,15 +1244,15 @@ create_job_file(
 
   for (nameptr = name; *job_name && nameptr < (name + sizeof(name) - 1); job_name ++)
   {
-    if (isalnum(*job_name & 255) || *job_name == '-')
+    if (isalnum(*job_name) || *job_name == '-')
     {
-      *nameptr++ = (char)tolower(*job_name & 255);
+      *nameptr++ = (char)tolower(*job_name);
     }
     else
     {
       *nameptr++ = '_';
 
-      while (job_name[1] && !isalnum(job_name[1] & 255) && job_name[1] != '-')
+      while (job_name[1] && !isalnum(job_name[1]) && job_name[1] != '-')
         job_name ++;
     }
   }
@@ -2111,8 +2111,7 @@ delete_job(ippeve_job_t *job)		/* I - Job */
 
   ippDelete(job->attrs);
 
-  if (job->message)
-    free(job->message);
+  free(job->message);
 
   if (job->filename)
   {
@@ -2158,26 +2157,17 @@ delete_printer(ippeve_printer_t *printer)	/* I - Printer */
   avahi_threaded_poll_unlock(DNSSDMaster);
 #endif /* HAVE_DNSSD */
 
-  if (printer->dnssd_name)
-    free(printer->dnssd_name);
-  if (printer->name)
-    free(printer->name);
-  if (printer->icons[0])
-    free(printer->icons[0]);
-  if (printer->strings)
-    free(printer->strings);
-  if (printer->command)
-    free(printer->command);
-  if (printer->device_uri)
-    free(printer->device_uri);
+  free(printer->dnssd_name);
+  free(printer->name);
+  free(printer->icons[0]);
+  free(printer->strings);
+  free(printer->command);
+  free(printer->device_uri);
 #if !CUPS_LITE
-  if (printer->ppdfile)
-    free(printer->ppdfile);
+  free(printer->ppdfile);
 #endif /* !CUPS_LITE */
-  if (printer->directory)
-    free(printer->directory);
-  if (printer->hostname)
-    free(printer->hostname);
+  free(printer->directory);
+  free(printer->hostname);
 
   ippDelete(printer->attrs);
   cupsArrayDelete(printer->jobs);
@@ -2357,7 +2347,7 @@ find_job(ippeve_client_t *client)		/* I - Client */
     const char *uriptr = strrchr(uri, '/');
 					/* Pointer to the last slash in the URI */
 
-    if (uriptr && isdigit(uriptr[1] & 255))
+    if (uriptr && isdigit(uriptr[1]))
       key.id = atoi(uriptr + 1);
     else
       return (NULL);
@@ -3001,7 +2991,7 @@ html_printf(ippeve_client_t *client,	/* I - Client */
       {
 	width = 0;
 
-	while (isdigit(*format & 255))
+	while (isdigit(*format))
 	{
 	  if (tptr < (tformat + sizeof(tformat) - 1))
 	    *tptr++ = *format;
@@ -3033,7 +3023,7 @@ html_printf(ippeve_client_t *client,	/* I - Client */
 	{
 	  prec = 0;
 
-	  while (isdigit(*format & 255))
+	  while (isdigit(*format))
 	  {
 	    if (tptr < (tformat + sizeof(tformat) - 1))
 	      *tptr++ = *format;
@@ -6014,7 +6004,7 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
 
   ptr = strrchr(client->host_field, '.');
 
-  if (!isdigit(client->host_field[0] & 255) && client->host_field[0] != '[' && strcmp(client->host_field, client->printer->hostname) && strcmp(client->host_field, "localhost") &&
+  if (!isdigit(client->host_field[0]) && client->host_field[0] != '[' && strcmp(client->host_field, client->printer->hostname) && strcmp(client->host_field, "localhost") &&
       (!ptr || (strcmp(ptr, ".local") && strcmp(ptr, ".local."))))
   {
     fprintf(stderr, "%s Bad Host: header '%s'.\n", client->hostname, client->host_field);
@@ -6719,7 +6709,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
         if (*name == '-')
 	  *valptr++ = '_';
 	else
-	  *valptr++ = (char)toupper(*name & 255);
+	  *valptr++ = (char)toupper(*name);
 
 	name ++;
       }
@@ -6752,7 +6742,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
         if (*name == '-')
 	  *valptr++ = '_';
 	else
-	  *valptr++ = (char)toupper(*name & 255);
+	  *valptr++ = (char)toupper(*name);
 
 	name ++;
       }

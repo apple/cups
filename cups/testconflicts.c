@@ -93,11 +93,11 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (!fgets(line, sizeof(line), stdin) || line[0] == '\n')
       break;
 
-    for (ptr = line; isspace(*ptr & 255); ptr ++);
+    for (ptr = line; isspace(*ptr); ptr ++);
     for (optr = ptr; *ptr && *ptr != '='; ptr ++);
     if (!*ptr)
       break;
-    for (*ptr++ = '\0', cptr = ptr; *ptr && !isspace(*ptr & 255); ptr ++);
+    for (*ptr++ = '\0', cptr = ptr; *ptr && !isspace(*ptr); ptr ++);
     if (!*ptr)
       break;
     *ptr++ = '\0';
@@ -112,10 +112,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     cupsFreeOptions(num_options, options);
   }
 
-  if (option)
-    free(option);
-  if (choice)
-    free(choice);
+  free(option);
+  free(choice);
 
   return (0);
 }

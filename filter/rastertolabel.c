@@ -87,7 +87,7 @@ void	ZPLCompress(unsigned char repeat_char, unsigned repeat_count);
 void
 Setup(ppd_file_t *ppd)			/* I - PPD file */
 {
-  int		i;			/* Looping var */
+  unsigned		i;			/* Looping var */
 
 
  /*
@@ -108,7 +108,7 @@ Setup(ppd_file_t *ppd)			/* I - PPD file */
 	* Clear any remaining data...
 	*/
 
-	for (i = 0; i < 100; i ++)
+	for (i = 100; i; i --)
 	  putchar(0x1b);
 
        /*
@@ -118,26 +118,20 @@ Setup(ppd_file_t *ppd)			/* I - PPD file */
 	fputs("\033@", stdout);
 	break;
 
-    case ZEBRA_EPL_LINE :
-	break;
+    case ZEBRA_EPL_LINE:
+    case ZEBRA_EPL_PAGE:
+    case ZEBRA_ZPL:
+    case ZEBRA_CPCL:
+      break;
 
-    case ZEBRA_EPL_PAGE :
-	break;
-
-    case ZEBRA_ZPL :
-        break;
-
-    case ZEBRA_CPCL :
-        break;
-
-    case INTELLITECH_PCL :
-       /*
+    case INTELLITECH_PCL:
+      /*
 	* Send a PCL reset sequence.
 	*/
 
-	putchar(0x1b);
-	putchar('E');
-        break;
+      putchar(0x1b);
+      putchar('E');
+      break;
   }
 }
 

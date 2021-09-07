@@ -7,6 +7,9 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _CERT_H
+#define _CERT_H
+
 /*
  * Certificate structure...
  */
@@ -40,3 +43,4 @@ extern void		cupsdDeleteCert(int pid);
 extern void		cupsdDeleteAllCerts(void);
 extern cupsd_cert_t	*cupsdFindCert(const char *certificate);
 extern void		cupsdInitCerts(void);
+#endif

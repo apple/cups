@@ -492,9 +492,9 @@ main(int  argc,				/* I - Number of command-line args */
 		snprintf(filename, sizeof(filename), "%s.gz", argv[i]);
                 if (access(filename, 0) && filename[0] != '/'
 #ifdef _WIN32
-                    && (!isalpha(filename[0] & 255) || filename[1] != ':')
+                    && (!isalpha(filename[0]) || filename[1] != ':')
 #endif /* _WIN32 */
-                    )
+                   )
 		{
 		  snprintf(filename, sizeof(filename), "%s/ipptool/%s", cg->cups_datadir, argv[i]);
 		  if (access(filename, 0))
@@ -638,7 +638,7 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_TLS
 	     || !strncmp(argv[i], "ipps://", 7) || !strncmp(argv[i], "https://", 8)
 #endif /* HAVE_TLS */
-	     )
+	    )
     {
      /*
       * Set URI...
@@ -679,9 +679,9 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (access(argv[i], 0) && argv[i][0] != '/'
 #ifdef _WIN32
-          && (!isalpha(argv[i][0] & 255) || argv[i][1] != ':')
+          && (!isalpha(argv[i][0]) || argv[i][1] != ':')
 #endif /* _WIN32 */
-          )
+         )
       {
         snprintf(testname, sizeof(testname), "%s/ipptool/%s", cg->cups_datadir, argv[i]);
         if (access(testname, 0))
@@ -1642,7 +1642,6 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
       if (ippGetStatusCode(response) == IPP_STATUS_ERROR_BUSY && data->repeat_on_busy)
       {
         // Repeat on a server-error-busy status code...
-        status_ok   = 1;
         repeat_test = 1;
       }
 
@@ -2473,9 +2472,9 @@ get_filename(const char *testfile,	/* I - Current test file */
   }
   else if (!access(src, R_OK) || *src == '/'
 #ifdef _WIN32
-           || (isalpha(*src & 255) && src[1] == ':')
+           || (isalpha(*src) && src[1] == ':')
 #endif /* _WIN32 */
-           )
+          )
   {
    /*
     * Use the path as-is...
@@ -3807,7 +3806,7 @@ print_xml_string(cups_file_t *outfile,	/* I - Test data */
         cupsFilePutChar(outfile, *s);
       }
     }
-    else if ((*s & 0x80) || (*s < ' ' && !isspace(*s & 255)))
+    else if ((*s & 0x80) || (*s < ' ' && !isspace(*s)))
     {
      /*
       * Invalid control character...
@@ -4086,7 +4085,7 @@ token_cb(_ipp_file_t    *f,		/* I - IPP file data */
 
       if (_ippFileReadToken(f, temp, sizeof(temp)))
       {
-	if (isdigit(temp[0] & 255))
+	if (isdigit(temp[0]))
 	{
 	  data->request_id = atoi(temp) - 1;
 	}
@@ -5551,12 +5550,12 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 
           valptr = value;
 
-	  while (isspace(*valptr & 255) || isdigit(*valptr & 255) ||
+	  while (isspace(*valptr) || isdigit(*valptr) ||
 		 *valptr == '-' || *valptr == ',' || *valptr == '<' ||
 		 *valptr == '=' || *valptr == '>')
 	  {
 	    op = '=';
-	    while (*valptr && !isdigit(*valptr & 255) && *valptr != '-')
+	    while (*valptr && !isdigit(*valptr) && *valptr != '-')
 	    {
 	      if (*valptr == '<' || *valptr == '>' || *valptr == '=')
 		op = *valptr;
@@ -5618,12 +5617,12 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 	  lower = ippGetRange(attr, i, &upper);
           valptr = value;
 
-	  while (isspace(*valptr & 255) || isdigit(*valptr & 255) ||
+	  while (isspace(*valptr) || isdigit(*valptr) ||
 		 *valptr == '-' || *valptr == ',' || *valptr == '<' ||
 		 *valptr == '=' || *valptr == '>')
 	  {
 	    op = '=';
-	    while (*valptr && !isdigit(*valptr & 255) && *valptr != '-')
+	    while (*valptr && !isdigit(*valptr) && *valptr != '-')
 	    {
 	      if (*valptr == '<' || *valptr == '>' || *valptr == '=')
 		op = *valptr;

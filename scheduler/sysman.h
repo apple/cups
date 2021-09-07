@@ -7,6 +7,9 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _SYSMAN_H
+#define _SYSMAN_H
+
 /*
  * Constants...
  */
@@ -53,3 +56,4 @@ extern void	cupsdMarkDirty(int what);
 extern void	cupsdSetBusyState(int working);
 extern void	cupsdStartSystemMonitor(void);
 extern void	cupsdStopSystemMonitor(void);
+#endif

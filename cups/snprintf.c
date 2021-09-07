@@ -90,7 +90,7 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
       {
 	width = 0;
 
-	while (isdigit(*format & 255))
+	while (isdigit(*format))
 	{
 	  if (tptr < (tformat + sizeof(tformat) - 1))
 	    *tptr++ = *format;
@@ -123,7 +123,7 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 	{
 	  prec = 0;
 
-	  while (isdigit(*format & 255))
+	  while (isdigit(*format))
 	  {
 	    if (tptr < (tformat + sizeof(tformat) - 1))
 	      *tptr++ = *format;
@@ -328,7 +328,7 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
   return (bytes);
 }
-#endif /* !HAVE_VSNPRINT */
+#endif /* !HAVE_VSNPRINTF */
 
 
 #ifndef HAVE_SNPRINTF

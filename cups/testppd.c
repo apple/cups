@@ -424,15 +424,14 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
     {
       status ++;
-      printf("FAIL (%d bytes instead of %d)\n", s ? (int)strlen(s) : 0,
-	     (int)strlen(default_code));
+      printf("FAIL (%u bytes instead of %u)\n", s ? (unsigned)strlen(s) : 0,
+             (unsigned)strlen(default_code));
 
       if (s)
 	puts(s);
     }
 
-    if (s)
-      free(s);
+    free(s);
 
     fputs("ppdEmitString (custom size and string): ", stdout);
     ppdMarkOption(ppd, "PageSize", "Custom.400x500");
@@ -444,15 +443,14 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
     {
       status ++;
-      printf("FAIL (%d bytes instead of %d)\n", s ? (int)strlen(s) : 0,
-	     (int)strlen(custom_code));
+      printf("FAIL (%u bytes instead of %u)\n", s ? (unsigned)strlen(s) : 0,
+             (unsigned)strlen(custom_code));
 
       if (s)
 	puts(s);
     }
 
-    if (s)
-      free(s);
+    free(s);
 
    /*
     * Test constraints...
@@ -831,15 +829,14 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
     {
       status ++;
-      printf("FAIL (%d bytes instead of %d)\n", s ? (int)strlen(s) : 0,
-	     (int)strlen(default2_code));
+      printf("FAIL (%u bytes instead of %u)\n", s ? (unsigned)strlen(s) : 0,
+	     (unsigned)strlen(default2_code));
 
       if (s)
 	puts(s);
     }
 
-    if (s)
-      free(s);
+    free(s);
 
     fputs("ppdConflicts(): ", stdout);
     ppdMarkOption(ppd, "PageSize", "Env10");

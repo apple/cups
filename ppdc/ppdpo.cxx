@@ -48,7 +48,7 @@ main(int  argc,				// I - Number of command-line arguments
   catalog = new ppdcCatalog("en");
   src     = new ppdcSource();
   verbose = 0;
-  outfile = 0;
+  outfile = NULL;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -100,7 +100,6 @@ main(int  argc,				// I - Number of command-line arguments
 
 	  default :			// Unknown
 	      usage();
-	      break;
 	}
     }
     else

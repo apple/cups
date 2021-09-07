@@ -165,20 +165,17 @@ _cupsRasterColorSpaceString(
  */
 
 void
-_cupsRasterDelete(cups_raster_t *r)	/* I - Stream to free */
+_cupsRasterDelete(cups_raster_t *r) /* I - Stream to free */
 {
-  if (r != NULL)
+  if (!r)
   {
-    if (r->buffer)
-      free(r->buffer);
-
-    if (r->pixels)
-      free(r->pixels);
-
-    free(r);
+    return;
   }
-}
 
+  free(r->buffer);
+  free(r->pixels);
+  free(r);
+}
 
 /*
  * '_cupsRasterInitPWGHeader()' - Initialize a page header for PWG Raster output.
@@ -294,17 +291,17 @@ _cupsRasterInitPWGHeader(
   }
   else if (!strncmp(type, "device", 6) && type[6] >= '1' && type[6] <= '9')
   {
-    int ncolors, bits;			/* Number of colors and bits */
+    unsigned ncolors, bits;			/* Number of colors and bits */
 
 
-    if (sscanf(type, "device%d_%d", &ncolors, &bits) != 2 || ncolors > 15 || (bits != 8 && bits != 16))
+    if (sscanf(type, "device%u_%u", &ncolors, &bits) != 2 || ncolors > 15 || (bits != 8 && bits != 16))
     {
       _cupsRasterAddError("Unsupported raster type \'%s\'.", type);
       return (0);
     }
 
-    h->cupsBitsPerColor = (unsigned)bits;
-    h->cupsBitsPerPixel = (unsigned)(ncolors * bits);
+    h->cupsBitsPerColor = bits;
+    h->cupsBitsPerPixel = ncolors * bits;
     h->cupsColorSpace   = (cups_cspace_t)(CUPS_CSPACE_DEVICE1 + ncolors - 1);
   }
   else if (!strcmp(type, "rgb_8"))
@@ -1670,8 +1667,7 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
 
   if (r->compressed)
   {
-    if (r->pixels != NULL)
-      free(r->pixels);
+    free(r->pixels);
 
     if ((r->pixels = calloc(r->header.cupsBytesPerLine, 1)) == NULL)
     {

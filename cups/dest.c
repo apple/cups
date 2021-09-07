@@ -3327,8 +3327,8 @@ cups_dnssd_unquote(char       *dst,	/* I - Destination buffer */
     if (*src == '\\')
     {
       src ++;
-      if (isdigit(src[0] & 255) && isdigit(src[1] & 255) &&
-          isdigit(src[2] & 255))
+      if (isdigit(src[0]) && isdigit(src[1]) &&
+          isdigit(src[2]))
       {
         *dst++ = ((((src[0] - '0') * 10) + src[1] - '0') * 10) + src[2] - '0';
 	src += 3;
@@ -4163,7 +4163,7 @@ cups_get_dests(
     * Search for an instance...
     */
 
-    while (!isspace(*lineptr & 255) && *lineptr && *lineptr != '/')
+    while (*lineptr != '/' && !isspace(*lineptr) && *lineptr)
       lineptr ++;
 
     if (*lineptr == '/')
@@ -4179,7 +4179,7 @@ cups_get_dests(
       * Search for an instance...
       */
 
-      while (!isspace(*lineptr & 255) && *lineptr)
+      while (!isspace(*lineptr) && *lineptr)
 	lineptr ++;
     }
     else

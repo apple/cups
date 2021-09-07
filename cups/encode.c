@@ -645,8 +645,7 @@ _cupsEncodeOption(
 	  {
 	    cupsFreeOptions(num_cols, cols);
 
-	    if (copy)
-	      free(copy);
+	    free(copy);
 
 	    ippDeleteAttribute(ipp, attr);
 	    return (NULL);
@@ -663,8 +662,7 @@ _cupsEncodeOption(
     }
   }
 
-  if (copy)
-    free(copy);
+  free(copy);
 
   return (attr);
 }

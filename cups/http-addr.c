@@ -45,7 +45,7 @@ httpAddrAny(const http_addr_t *addr)	/* I - Address to check */
 #endif /* AF_INET6 */
 
   if (addr->addr.sa_family == AF_INET &&
-      ntohl(addr->ipv4.sin_addr.s_addr) == 0x00000000)
+      ntohl(addr->ipv4.sin_addr.s_addr) == 0x00000000U)
     return (1);
 
   return (0);
@@ -157,7 +157,7 @@ int					/* O - Socket or -1 on error */
 httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
                int         port)	/* I - Port number to bind to */
 {
-  int		fd = -1,		/* Socket */
+  int		fd,		/* Socket */
 		val,			/* Socket value */
                 status;			/* Bind status */
 
@@ -725,7 +725,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
   }
 #endif /* AF_LOCAL */
 
-  for (nameptr = name; isdigit(*nameptr & 255) || *nameptr == '.'; nameptr ++);
+  for (nameptr = name; isdigit(*nameptr) || *nameptr == '.'; nameptr ++);
 
   if (!*nameptr)
   {
@@ -908,7 +908,7 @@ httpResolveHostname(http_t *http,	/* I - HTTP connection */
   if (!http)
     return (NULL);
 
-  if (isdigit(http->hostname[0] & 255) || http->hostname[0] == '[')
+  if (isdigit(http->hostname[0]) || http->hostname[0] == '[')
   {
     char	temp[1024];		/* Temporary string */
 

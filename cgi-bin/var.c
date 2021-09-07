@@ -43,7 +43,7 @@ typedef struct				/**** Form variable structure ****/
 
 static int		num_cookies = 0;/* Number of cookies */
 static cups_option_t	*cookies = NULL;/* Cookies */
-static int		form_count = 0,	/* Form variable count */
+static size_t		form_count = 0,	/* Form variable count */
 			form_alloc = 0;	/* Number of variables allocated */
 static _cgi_var_t	*form_vars = NULL;
 					/* Form variables */
@@ -133,7 +133,8 @@ cgiCheckVariables(const char *names)	/* I - Variables to look for */
 void
 cgiClearVariables(void)
 {
-  int		i, j;			/* Looping vars */
+  size_t		i;
+  int j;			    /* Looping vars */
   _cgi_var_t	*v;			/* Current variable */
 
 
@@ -143,8 +144,7 @@ cgiClearVariables(void)
   {
     free(v->name);
     for (j = 0; j < v->nvalues; j ++)
-      if (v->values[j])
-        free(v->values[j]);
+      free(v->values[j]);
   }
 
   form_count = 0;
@@ -316,12 +316,13 @@ cgiInitialize(void)
 	strcmp(cups_sid_cookie, cups_sid_form))
     {
       if (cups_sid_form)
-	fprintf(stderr, "DEBUG: " CUPS_SID " form variable is \"%s\"\n",
-	        cups_sid_form);
+      {
+        fprintf(stderr, "DEBUG: " CUPS_SID " form variable is \"%s\"\n",
+                cups_sid_form);
+        free((void *)cups_sid_form);
+      }
       else
-	fputs("DEBUG: " CUPS_SID " form variable is not present.\n", stderr);
-
-      free((void *)cups_sid_form);
+        fputs("DEBUG: " CUPS_SID " form variable is not present.\n", stderr);
 
       cgiClearVariables();
 
@@ -396,15 +397,17 @@ cgiSetArray(const char *name,		/* I - Name of variable */
       var->values  = temp;
     }
 
-    if (element >= var->nvalues)
+    if (element < var->nvalues)
     {
-      for (i = var->nvalues; i < element; i ++)
-	var->values[i] = NULL;
+      free((char *)var->values[element]);
+    }
+    else
+    {
+      for (i = var->nvalues; i < element; i++)
+        var->values[i] = NULL;
 
       var->nvalues = element + 1;
     }
-    else if (var->values[element])
-      free((char *)var->values[element]);
 
     var->values[element] = strdup(value);
   }
@@ -515,9 +518,8 @@ cgiSetVariable(const char *name,	/* I - Name of variable */
   }
   else
   {
-    for (i = 0; i < var->nvalues; i ++)
-      if (var->values[i])
-        free((char *)var->values[i]);
+    for (i = 0; i < var->nvalues; i++)
+      free((char *)var->values[i]);
 
     var->values[0] = strdup(value);
     var->nvalues   = 1;
@@ -628,7 +630,7 @@ cgi_initialize_cookies(void)
     * Skip leading whitespace...
     */
 
-    while (isspace(*cookie & 255))
+    while (isspace(*cookie))
       cookie ++;
     if (!*cookie)
       break;
@@ -874,7 +876,7 @@ cgi_initialize_multipart(
         * Set the form variable...
 	*/
 
-	if ((ptr = strrchr(name, '-')) != NULL && isdigit(ptr[1] & 255))
+	if ((ptr = strrchr(name, '-')) != NULL && isdigit(ptr[1]))
 	{
 	 /*
 	  * Set a specific index in the array...
@@ -937,12 +939,12 @@ cgi_initialize_multipart(
     }
     else if (!_cups_strncasecmp(line, "Content-Type:", 13))
     {
-      for (ptr = line + 13; isspace(*ptr & 255); ptr ++);
+      for (ptr = line + 13; isspace(*ptr); ptr ++);
 
       strlcpy(mimetype, ptr, sizeof(mimetype));
 
       for (ptr = mimetype + strlen(mimetype) - 1;
-           ptr > mimetype && isspace(*ptr & 255);
+           ptr > mimetype && isspace(*ptr);
 	   *ptr-- = '\0');
     }
   }
@@ -1099,7 +1101,7 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
 	    * Read the hex code...
 	    */
 
-            if (!isxdigit(data[1] & 255) || !isxdigit(data[2] & 255))
+            if (!isxdigit(data[1]) || !isxdigit(data[2]))
 	      return (0);
 
             if (s < (value + sizeof(value) - 1))
@@ -1135,14 +1137,14 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
     if (s > value)
       s --;
 
-    while (s >= value && isspace(*s & 255))
+    while (s >= value && isspace(*s))
       *s-- = '\0';
 
    /*
     * Add the string to the variable "database"...
     */
 
-    if ((s = strrchr(name, '-')) != NULL && isdigit(s[1] & 255))
+    if ((s = strrchr(name, '-')) != NULL && isdigit(s[1]))
     {
       *s++ = '\0';
       if (value[0])
@@ -1219,10 +1221,10 @@ cgi_set_sid(void)
   CUPS_SRAND(curtime.tv_sec + curtime.tv_usec);
   snprintf(buffer, sizeof(buffer), "%s:%s:%s:%02X%02X%02X%02X%02X%02X%02X%02X",
            remote_addr, server_name, server_port,
-	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255,
-	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255,
-	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255,
-	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255);
+	   (unsigned)(CUPS_RAND() & 255), (unsigned)(CUPS_RAND() & 255),
+	   (unsigned)(CUPS_RAND() & 255), (unsigned)(CUPS_RAND() & 255),
+	   (unsigned)(CUPS_RAND() & 255), (unsigned)(CUPS_RAND() & 255),
+	   (unsigned)(CUPS_RAND() & 255), (unsigned)(CUPS_RAND() & 255));
   cupsHashData("md5", (unsigned char *)buffer, strlen(buffer), sum, sizeof(sum));
 
   cgiSetCookie(CUPS_SID, cupsHashString(sum, sizeof(sum), sid, sizeof(sid)), "/", NULL, 0, 0);

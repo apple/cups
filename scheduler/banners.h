@@ -7,6 +7,8 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _BANNERS_H
+#define _BANNERS_H
 /*
  * Banner information structure...
  */
@@ -32,3 +34,4 @@ VAR cups_array_t	*Banners	VALUE(NULL);
 
 extern cupsd_banner_t	*cupsdFindBanner(const char *name);
 extern void		cupsdLoadBanners(const char *d);
+#endif

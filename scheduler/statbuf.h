@@ -7,6 +7,8 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _STATBUF_H
+#define _STATBUF_H
 
 /*
  * Constants...
@@ -36,3 +38,4 @@ extern void		cupsdStatBufDelete(cupsd_statbuf_t *sb);
 extern cupsd_statbuf_t	*cupsdStatBufNew(int fd, const char *prefix, ...);
 extern char		*cupsdStatBufUpdate(cupsd_statbuf_t *sb, int *loglevel,
 			                    char *line, int linelen);
+#endif

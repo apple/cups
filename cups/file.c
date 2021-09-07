@@ -124,17 +124,15 @@ _cupsFileCheck(
 
   result = _CUPS_FILE_CHECK_OK;
 
-  switch (filetype)
+  if (filetype == _CUPS_FILE_CHECK_DIRECTORY)
   {
-    case _CUPS_FILE_CHECK_DIRECTORY :
-        if (!S_ISDIR(fileinfo.st_mode))
-	  result = _CUPS_FILE_CHECK_WRONG_TYPE;
-        break;
-
-    default :
-        if (!S_ISREG(fileinfo.st_mode))
-	  result = _CUPS_FILE_CHECK_WRONG_TYPE;
-        break;
+    if (!S_ISDIR(fileinfo.st_mode))
+      result = _CUPS_FILE_CHECK_WRONG_TYPE;
+  }
+  else
+  {
+    if (!S_ISREG(fileinfo.st_mode))
+      result = _CUPS_FILE_CHECK_WRONG_TYPE;
   }
 
   if (result)
@@ -452,8 +450,7 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
   fd   = fp->fd;
   mode = fp->mode;
 
-  if (fp->printf_buffer)
-    free(fp->printf_buffer);
+  free(fp->printf_buffer);
 
   free(fp);
 
@@ -556,7 +553,7 @@ cupsFileFind(const char *filename,	/* I - File to find */
   while (*path)
   {
 #ifdef _WIN32
-    if (*path == ';' || (*path == ':' && ((bufptr - buffer) > 1 || !isalpha(buffer[0] & 255))))
+    if (*path == ';' || (*path == ':' && ((bufptr - buffer) > 1 || !isalpha(buffer[0]))))
 #else
     if (*path == ';' || *path == ':')
 #endif /* _WIN32 */
@@ -862,10 +859,9 @@ cupsFileGetLine(cups_file_t *fp,	/* I - File to read from */
                 char        *buf,	/* I - Buffer */
                 size_t      buflen)	/* I - Size of buffer */
 {
-  int		ch;			/* Character from file */
-  char		*ptr,			/* Current position in line buffer */
-		*end;			/* End of line buffer */
-
+  char ch,  /* Character from file */
+      *ptr, /* Current position in line buffer */
+      *end; /* End of line buffer */
 
  /*
   * Range check input...
@@ -936,7 +932,7 @@ cupsFileGets(cups_file_t *fp,		/* I - CUPS file */
              char        *buf,		/* O - String buffer */
 	     size_t      buflen)	/* I - Size of string buffer */
 {
-  int		ch;			/* Character from file */
+  char		ch;			  /* Character from file */
   char		*ptr,			/* Current position in line buffer */
 		*end;			/* End of line buffer */
 
@@ -995,7 +991,7 @@ cupsFileGets(cups_file_t *fp,		/* I - CUPS file */
       break;
     }
     else
-      *ptr++ = (char)ch;
+      *ptr++ = ch;
   }
 
   *ptr = '\0';
@@ -1090,7 +1086,7 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
 
   if (!filename || !mode ||
       (*mode != 'r' && *mode != 'w' && *mode != 'a' && *mode != 's') ||
-      (*mode == 'a' && isdigit(mode[1] & 255)))
+      (*mode == 'a' && isdigit(mode[1])))
     return (NULL);
 
  /*
@@ -1207,7 +1203,7 @@ cupsFileOpenFd(int        fd,		/* I - File descriptor */
 
   if (fd < 0 || !mode ||
       (*mode != 'r' && *mode != 'w' && *mode != 'a' && *mode != 's') ||
-      (*mode == 'a' && isdigit(mode[1] & 255)))
+      (*mode == 'a' && isdigit(mode[1])))
     return (NULL);
 
  /*
@@ -2298,7 +2294,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	  return (-1);
 	}
 
-	bytes = ((unsigned char)ptr[1] << 8) | (unsigned char)ptr[0];
+	bytes = (ptr[1] << 8) | ptr[0];
 	ptr   += 2 + bytes;
 
 	if (ptr > end)

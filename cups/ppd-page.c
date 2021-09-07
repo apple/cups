@@ -15,8 +15,8 @@
  */
 
 #include "string-private.h"
-#include "debug-internal.h"
 #include "ppd.h"
+#include "debug-internal.h"
 
 
 /*
@@ -353,7 +353,7 @@ ppdPageWidth(ppd_file_t *ppd,	/* I - PPD file record */
 
 
   if ((size = ppdPageSize(ppd, name)) == NULL)
-    return (0.0);
+    return (0.0f);
   else
     return (size->width);
 }
@@ -371,7 +371,7 @@ ppdPageLength(ppd_file_t *ppd,	/* I - PPD file */
 
 
   if ((size = ppdPageSize(ppd, name)) == NULL)
-    return (0.0);
+    return (0.0f);
   else
     return (size->length);
 }

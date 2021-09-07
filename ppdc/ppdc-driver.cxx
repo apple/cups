@@ -159,7 +159,7 @@ ppdcDriver::~ppdcDriver()
 
 ppdcAttr *				// O - Attribute or NULL
 ppdcDriver::find_attr(const char *k,	// I - Keyword string
-                      const char *s)	// I - Spec string
+                      const char *s) const	// I - Spec string
 {
   ppdcAttr	*a;			// Current attribute
 
@@ -179,7 +179,7 @@ ppdcDriver::find_attr(const char *k,	// I - Keyword string
 //
 
 ppdcGroup *				// O - Matching group or NULL
-ppdcDriver::find_group(const char *n)	// I - Group name
+ppdcDriver::find_group(const char *n) const	// I - Group name
 {
   ppdcGroup	*g;			// Current group
 

@@ -248,7 +248,7 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     if (!S_ISREG(dent->fileinfo.st_mode) ||
-        !isalnum(dent->filename[0] & 255) ||
+        !isalnum(dent->filename[0]) ||
         (dent->fileinfo.st_mode & (S_IRUSR | S_IXUSR)) != (S_IRUSR | S_IXUSR))
       continue;
 
@@ -497,10 +497,10 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
     dclass = temp;
 
     for (ptr = temp; *ptr; ptr ++)
-      if (isspace(*ptr & 255))
+      if (isspace(*ptr))
         break;
 
-    while (isspace(*ptr & 255))
+    while (isspace(*ptr))
       *ptr++ = '\0';
 
    /*
@@ -511,10 +511,10 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
       goto error;
 
     for (uri = ptr; *ptr; ptr ++)
-      if (isspace(*ptr & 255))
+      if (isspace(*ptr))
         break;
 
-    while (isspace(*ptr & 255))
+    while (isspace(*ptr))
       *ptr++ = '\0';
 
    /*
@@ -533,7 +533,7 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
     if (*ptr != '\"')
       goto error;
 
-    for (*ptr++ = '\0'; isspace(*ptr & 255); *ptr++ = '\0');
+    for (*ptr++ = '\0'; isspace(*ptr); *ptr++ = '\0');
 
    /*
     * device-info
@@ -551,7 +551,7 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
     if (*ptr != '\"')
       goto error;
 
-    for (*ptr++ = '\0'; isspace(*ptr & 255); *ptr++ = '\0');
+    for (*ptr++ = '\0'; isspace(*ptr); *ptr++ = '\0');
 
    /*
     * device-id
@@ -568,7 +568,7 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
       if (*ptr != '\"')
 	goto error;
 
-      for (*ptr++ = '\0'; isspace(*ptr & 255); *ptr++ = '\0');
+      for (*ptr++ = '\0'; isspace(*ptr); *ptr++ = '\0');
 
      /*
       * device-location

@@ -603,8 +603,7 @@ mime_delete_fcache(
   {
     free(current->name);
 
-    if (current->path)
-      free(current->path);
+    free(current->path);
 
     free(current);
   }
@@ -701,7 +700,7 @@ mime_load_convs(
     */
 
     for (lineptr = line + strlen(line) - 1;
-         lineptr >= line && isspace(*lineptr & 255);
+         lineptr >= line && isspace(*lineptr);
 	 lineptr --)
       *lineptr = '\0';
 
@@ -721,7 +720,7 @@ mime_load_convs(
 
     while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
            (temp - super + 1) < MIME_MAX_SUPER)
-      *temp++ = (char)tolower(*lineptr++ & 255);
+      *temp++ = (char)tolower(*lineptr++);
 
     *temp = '\0';
 
@@ -733,7 +732,7 @@ mime_load_convs(
 
     while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
            *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
-      *temp++ = (char)tolower(*lineptr++ & 255);
+      *temp++ = (char)tolower(*lineptr++);
 
     *temp = '\0';
 
@@ -794,7 +793,7 @@ mime_load_convs(
 
     while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
            (temp - super + 1) < MIME_MAX_SUPER)
-      *temp++ = (char)tolower(*lineptr++ & 255);
+      *temp++ = (char)tolower(*lineptr++);
 
     *temp = '\0';
 
@@ -806,7 +805,7 @@ mime_load_convs(
 
     while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
            *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
-      *temp++ = (char)tolower(*lineptr++ & 255);
+      *temp++ = (char)tolower(*lineptr++);
 
     *temp = '\0';
 
@@ -907,7 +906,7 @@ mime_load_types(mime_t     *mime,	/* I - MIME database */
 
     while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
            (temp - super + 1) < MIME_MAX_SUPER)
-      *temp++ = (char)tolower(*lineptr++ & 255);
+      *temp++ = (char)tolower(*lineptr++);
 
     *temp = '\0';
 
@@ -919,7 +918,7 @@ mime_load_types(mime_t     *mime,	/* I - MIME database */
 
     while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
            *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
-      *temp++ = (char)tolower(*lineptr++ & 255);
+      *temp++ = (char)tolower(*lineptr++);
 
     *temp = '\0';
 

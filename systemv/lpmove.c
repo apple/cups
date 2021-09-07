@@ -104,7 +104,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if ((job = strrchr(argv[i], '-')) != NULL &&
           cupsGetDest(argv[i], NULL, num_dests, dests) == NULL)
         jobid = atoi(job + 1);
-      else if (isdigit(argv[i][0] & 255) &&
+      else if (isdigit(argv[i][0]) &&
                !cupsGetDest(argv[i], NULL, num_dests, dests))
         jobid = atoi(argv[i]);
       else

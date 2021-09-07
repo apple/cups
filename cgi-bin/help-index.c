@@ -299,7 +299,7 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 	  if ((ptr = strchr(line, ' ')) == NULL)
             break;
 
-	  while (isspace(*ptr & 255))
+	  while (isspace(*ptr))
             *ptr++ = '\0';
 
 	  if ((anchor = strrchr(filename, '#')) != NULL)
@@ -313,7 +313,7 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 	  offset = strtoll(ptr, &ptr, 10);
 	  length = (size_t)strtoll(ptr, &ptr, 10);
 
-	  while (isspace(*ptr & 255))
+	  while (isspace(*ptr))
             ptr ++;
 
           if (!anchor)
@@ -338,7 +338,7 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 
             strlcpy(section, sectptr, sizeof(section));
 
-	    while (isspace(*ptr & 255))
+	    while (isspace(*ptr))
               ptr ++;
           }
           else
@@ -686,17 +686,10 @@ help_delete_node(help_node_t *n)	/* I - Node */
   if (!n)
     return;
 
-  if (n->filename)
-    free(n->filename);
-
-  if (n->anchor)
-    free(n->anchor);
-
-  if (n->section)
-    free(n->section);
-
-  if (n->text)
-    free(n->text);
+  free(n->filename);
+  free(n->anchor);
+  free(n->section);
+  free(n->text);
 
   for (w = (help_word_t *)cupsArrayFirst(n->words);
        w;
@@ -719,8 +712,7 @@ help_delete_word(help_word_t *w)	/* I - Word */
   if (!w)
     return;
 
-  if (w->text)
-    free(w->text);
+  free(w->text);
 
   free(w);
 }
@@ -874,7 +866,7 @@ help_load_file(
       * Got section line, copy it!
       */
 
-      for (ptr += 13; isspace(*ptr & 255); ptr ++);
+      for (ptr += 13; isspace(*ptr); ptr ++);
 
       strlcpy(section, ptr, sizeof(section));
       if ((ptr = strstr(section, "-->")) != NULL)
@@ -883,9 +875,9 @@ help_load_file(
         * Strip comment stuff from end of line...
 	*/
 
-        for (*ptr-- = '\0'; ptr > line && isspace(*ptr & 255); *ptr-- = '\0');
+        for (*ptr-- = '\0'; ptr > line && isspace(*ptr); *ptr-- = '\0');
 
-	if (isspace(*ptr & 255))
+	if (isspace(*ptr))
 	  *ptr = '\0';
       }
       continue;
@@ -942,7 +934,7 @@ help_load_file(
 
           anchor = ptr + 1;
 
-	  for (ptr = anchor; *ptr && *ptr != '>' && !isspace(*ptr & 255); ptr ++);
+	  for (ptr = anchor; *ptr && *ptr != '>' && !isspace(*ptr); ptr ++);
 
 	  if (*ptr != '>')
 	    *ptr++ = '\0';
@@ -1000,11 +992,9 @@ help_load_file(
 
         cupsArrayRemove(hi->nodes, node);
 
-        if (node->section)
-	  free(node->section);
+        free(node->section);
 
-	if (node->text)
-	  free(node->text);
+        free(node->text);
 
         if (node->words)
 	{
@@ -1038,12 +1028,13 @@ help_load_file(
       */
 
       for (ptr = node->text, text = node->text; *ptr;)
-	if (isspace(*ptr & 255))
+	if (isspace(*ptr))
 	{
-	  while (isspace(*ptr & 255))
-	    ptr ++;
+    do
+      ptr++;
+    while (isspace(*ptr));
 
-	  *text++ = ' ';
+    *text++ = ' ';
         }
 	else if (text != ptr)
 	  *text++ = *ptr++;
@@ -1127,14 +1118,14 @@ help_load_file(
 
 	  continue;
 	}
-	else if (!isalnum(*ptr & 255))
+	else if (!isalnum(*ptr))
           continue;
 
        /*
 	* Found the start of a word, search until we find the end...
 	*/
 
-	for (text = ptr, ptr ++; *ptr && isalnum(*ptr & 255); ptr ++);
+	for (text = ptr, ptr ++; *ptr && isalnum(*ptr); ptr ++);
 
 	wordlen = (int)(ptr - text);
 

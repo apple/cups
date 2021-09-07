@@ -1207,9 +1207,9 @@ _ppdOpen(
       * CUPS STR #3421: Check for "*JobPatchFile: int: string"
       */
 
-      if (isdigit(*string & 255))
+      if (isdigit(*string))
       {
-        for (sptr = string + 1; isdigit(*sptr & 255); sptr ++);
+        for (sptr = string + 1; isdigit(*sptr); sptr ++);
 
         if (*sptr == ':')
         {
@@ -2542,14 +2542,14 @@ ppd_decode(char *string)		/* I - String to decode */
   outptr = string;
 
   while (*inptr != '\0')
-    if (*inptr == '<' && isxdigit(inptr[1] & 255))
+    if (*inptr == '<' && isxdigit(inptr[1]))
     {
      /*
       * Convert hex to 8-bit values...
       */
 
       inptr ++;
-      while (isxdigit(*inptr & 255))
+      while (isxdigit(*inptr))
       {
 	if (_cups_isalpha(*inptr))
 	  *outptr = (char)((tolower(*inptr) - 'a' + 10) << 4);
@@ -2558,7 +2558,7 @@ ppd_decode(char *string)		/* I - String to decode */
 
 	inptr ++;
 
-        if (!isxdigit(*inptr & 255))
+        if (!isxdigit(*inptr))
 	  break;
 
 	if (_cups_isalpha(*inptr))

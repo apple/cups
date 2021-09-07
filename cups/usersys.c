@@ -413,7 +413,7 @@ cupsSetServer(const char *server)	/* I - Server name */
       cg->server_version = 20;
 
     if (cg->server[0] != '/' && (port = strrchr(cg->server, ':')) != NULL &&
-        !strchr(port, ']') && isdigit(port[1] & 255))
+        !strchr(port, ']') && isdigit(port[1]))
     {
       *port++ = '\0';
 

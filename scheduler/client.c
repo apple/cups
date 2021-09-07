@@ -2391,7 +2391,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	    if (value)
 	    {
 	      *value++ = '\0';
-	      while (isspace(*value & 255))
+	      while (isspace(*value))
 		value ++;
 	    }
 
@@ -3309,8 +3309,8 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 	else
 	  break;
       }
-      else if (*commptr == '%' && isxdigit(commptr[1] & 255) &&
-               isxdigit(commptr[2] & 255))
+      else if (*commptr == '%' && isxdigit(commptr[1]) &&
+               isxdigit(commptr[2]))
       {
        /*
 	* Convert the %xx notation to the individual character.
@@ -3613,7 +3613,7 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
   * Check if the hostname is an IP address...
   */
 
-  if (isdigit(con->clientname[0] & 255) || con->clientname[0] == '[')
+  if (isdigit(con->clientname[0]) || con->clientname[0] == '[')
   {
    /*
     * Possible IPv4/IPv6 address...

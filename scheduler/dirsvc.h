@@ -11,6 +11,9 @@
  * Browse protocols...
  */
 
+#ifndef _DIRSVC_H
+#define _DIRSVC_H
+
 #define BROWSE_DNSSD	1		/* DNS Service Discovery (aka Bonjour) */
 #define BROWSE_SMB	2		/* SMB/Samba */
 #define BROWSE_LPD	4		/* LPD via xinetd or launchd */
@@ -71,3 +74,4 @@ extern void	cupsdStopBrowsing(void);
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
 extern void	cupsdUpdateDNSSDName(void);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
+#endif /* _DIRSVC_H */

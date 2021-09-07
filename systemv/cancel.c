@@ -197,7 +197,7 @@ main(int  argc,				/* I - Number of command-line arguments */
         dest   = argv[i];
 	job_id = 0;
       }
-      else if ((job = strrchr(argv[i], '-')) != NULL && isdigit(job[1] & 255))
+      else if ((job = strrchr(argv[i], '-')) != NULL && isdigit(job[1]))
       {
        /*
         * Delete the specified job ID.
@@ -207,7 +207,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	op     = IPP_CANCEL_JOB;
         job_id = atoi(job + 1);
       }
-      else if (isdigit(argv[i][0] & 255))
+      else if (isdigit(argv[i][0]))
       {
        /*
         * Delete the specified job ID.

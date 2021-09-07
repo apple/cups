@@ -73,7 +73,7 @@ ppdcGroup::~ppdcGroup()
 //
 
 ppdcOption *
-ppdcGroup::find_option(const char *n)	// I - Name of option
+ppdcGroup::find_option(const char *n) const	// I - Name of option
 {
   ppdcOption	*o;			// Current option
 
@@ -82,5 +82,5 @@ ppdcGroup::find_option(const char *n)	// I - Name of option
     if (!_cups_strcasecmp(n, o->name->value))
       return (o);
 
-  return (0);
+  return (NULL);
 }

@@ -380,14 +380,14 @@ cupsdLoadAllClasses(void)
       * Option name value
       */
 
-      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+      for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
 
       if (!*valueptr)
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
       else
       {
-        for (; *valueptr && isspace(*valueptr & 255); *valueptr++ = '\0');
+        for (; *valueptr && isspace(*valueptr); *valueptr++ = '\0');
 
         p->num_options = cupsAddOption(value, valueptr, p->num_options,
 	                               &(p->options));
@@ -526,7 +526,7 @@ cupsdLoadAllClasses(void)
       if (value)
       {
 	for (valueptr = value;
-	     *valueptr && !isspace(*valueptr & 255);
+	     *valueptr && !isspace(*valueptr);
 	     valueptr ++);
 
 	if (*valueptr)
@@ -534,13 +534,13 @@ cupsdLoadAllClasses(void)
 
 	cupsdSetString(&p->job_sheets[0], value);
 
-	while (isspace(*valueptr & 255))
+	while (isspace(*valueptr))
           valueptr ++;
 
 	if (*valueptr)
 	{
           for (value = valueptr;
-	       *valueptr && !isspace(*valueptr & 255);
+	       *valueptr && !isspace(*valueptr);
 	       valueptr ++);
 
 	  if (*valueptr)

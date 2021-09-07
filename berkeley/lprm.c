@@ -161,7 +161,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         name   = argv[i];
         job_id = 0;
       }
-      else if (isdigit(argv[i][0] & 255))
+      else if (isdigit(argv[i][0]))
       {
         name   = NULL;
         job_id = atoi(argv[i]);

@@ -7,6 +7,9 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _COMMON_H
+#define _COMMON_H
+
 /*
  * Include necessary headers...
  */
@@ -63,3 +66,5 @@ extern void	WriteTextComment(const char *name, const char *value);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#endif /* _COMMON_H */

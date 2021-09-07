@@ -11,6 +11,9 @@
  * Constants...
  */
 
+#ifndef _JOB_H
+#define _JOB_H
+
 typedef enum cupsd_jobaction_e		/**** Actions for state changes ****/
 {
   CUPSD_JOB_DEFAULT,			/* Use default action */
@@ -171,3 +174,5 @@ extern void		cupsdStopAllJobs(cupsd_jobaction_t action,
 extern int		cupsdTimeoutJob(cupsd_job_t *job);
 extern void		cupsdUnloadCompletedJobs(void);
 extern void		cupsdUpdateJobs(void);
+
+#endif

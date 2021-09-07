@@ -496,7 +496,7 @@ apple_register_profiles(
 
 	if ((profileid_attr = ppdFindAttr(ppd, "cupsProfileID",
 					  attr->spec)) != NULL &&
-	    profileid_attr->value && isdigit(profileid_attr->value[0] & 255))
+	    profileid_attr->value && isdigit(profileid_attr->value[0]))
 	  profile_id = (unsigned)strtoul(profileid_attr->value, NULL, 10);
 	else
 	  profile_id = _ppdHashName(attr->spec);
@@ -984,8 +984,7 @@ colord_create_device(
 
 out:
 
-  if (default_profile_path)
-    free(default_profile_path);
+  free(default_profile_path);
 
   if (message)
     dbus_message_unref(message);
@@ -1093,8 +1092,7 @@ out:
   if (reply)
     dbus_message_unref(reply);
 
-  if (idstr)
-    free(idstr);
+  free(idstr);
 }
 
 
@@ -1151,8 +1149,7 @@ colord_delete_device(
 
 out:
 
-  if (device_path)
-    free(device_path);
+  free(device_path);
 
   if (message)
     dbus_message_unref(message);

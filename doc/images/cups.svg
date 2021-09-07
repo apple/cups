@@ -283,8 +283,7 @@
          id="stop3164" />
     </linearGradient>
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath3257">
+            id="clipPath3257">
       <path
          transform="matrix(1,0,0,0.9882639,0,5.8678726e-2)"
          d="M 95 50.534397 A 45 45.534397 0 1 1  5,50.534397 A 45 45.534397 0 1 1  95 50.534397 z"
@@ -297,8 +296,7 @@
          sodipodi:type="arc" />
     </clipPath>
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath3704">
+            id="clipPath3704">
       <path
          sodipodi:type="arc"
          style="opacity:1;fill:#000000;fill-opacity:0.49803922;fill-rule:nonzero;stroke:none;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -329,8 +327,7 @@
        y2="53.815262"
        gradientUnits="userSpaceOnUse" />
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath3295">
+            id="clipPath3295">
       <path
          transform="matrix(0.8148984,0,0,0.6256338,5.5549494,4.4908095)"
          d="M 96.184742,26.706827 A 44.477913,23.293173 0 1 1 7.2289162,26.706827 A 44.477913,23.293173 0 1 1 96.184742,26.706827 z"
@@ -343,8 +340,7 @@
          sodipodi:type="arc" />
     </clipPath>
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath3371">
+            id="clipPath3371">
       <path
          sodipodi:type="arc"
          style="opacity:1;fill:#ffffbf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -366,7 +362,7 @@
        fy="71.446022"
        r="41.566265"
        gradientTransform="matrix(1,0,0,1.5633645,0,-39.484036)"
-       gradientUnits="userSpaceOnUse" />
+    />
     <filter
        inkscape:collect="always"
        id="filter3587"
@@ -380,8 +376,7 @@
          id="feGaussianBlur3589" />
     </filter>
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath3591">
+            id="clipPath3591">
       <path
          transform="translate(2.9340892e-7,-2.3929013)"
          d="M 92.971889,50.301205 A 41.566265,43.072289 0 1 1 9.8393593,50.301205 A 41.566265,43.072289 0 1 1 92.971889,50.301205 z"
@@ -411,7 +406,7 @@
        fy="27.94368"
        r="12.5502"
        gradientTransform="matrix(-1.9906652,-2.2927541e-8,1.4386067e-8,-1.5156153,-20.117928,50.98641)"
-       gradientUnits="userSpaceOnUse" />
+    />
     <filter
        inkscape:collect="always"
        id="filter3797"
@@ -442,7 +437,7 @@
        fy="29.116467"
        r="12.5502"
        gradientTransform="matrix(-1,-6.831379e-8,3.8912925e-8,-0.6320001,-13.453817,27.036147)"
-       gradientUnits="userSpaceOnUse" />
+    />
   </defs>
   <sodipodi:namedview
      id="base"

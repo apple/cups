@@ -40,6 +40,4 @@ main(void)
     cupsFreeDests(num_dests, dests);
     sleep(1);
   }
-
-  return (0);
 }

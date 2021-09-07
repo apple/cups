@@ -7,6 +7,9 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _SUBSCRIPTIONS_H
+#define _SUBSCRIPTIONS_H
+
 /*
  * Event mask enumeration...
  */
@@ -153,3 +156,4 @@ extern void	cupsdExpireSubscriptions(cupsd_printer_t *dest,
 extern void	cupsdLoadAllSubscriptions(void);
 extern void	cupsdSaveAllSubscriptions(void);
 extern void	cupsdStopAllNotifiers(void);
+#endif

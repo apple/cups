@@ -216,4 +216,4 @@ extern int		_ippVarsSet(_ipp_vars_t *v, const char *name, const char *value) _CU
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-#endif /* !_CUPS_IPP_H_ */
+#endif /* !_CUPS_IPP_PRIVATE_H_ */

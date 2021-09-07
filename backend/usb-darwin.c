@@ -1628,9 +1628,8 @@ static CFStringRef copy_printer_interface_deviceid(printer_interface_t printer, 
 			}
 		}
 
-		if (request.pData)
-			free(request.pData);
-	}
+    free(request.pData);
+  }
 
 	CFStringRef manufacturer = deviceIDCopyManufacturer(ret);
 	CFStringRef model = deviceIDCopyModel(ret);

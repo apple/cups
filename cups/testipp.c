@@ -373,8 +373,8 @@ main(int  argc,			/* I - Number of command-line arguments */
     length = ippLength(request);
     if (length != sizeof(collection))
     {
-      printf("FAIL - wrong ippLength(), %d instead of %d bytes!\n",
-             (int)length, (int)sizeof(collection));
+      printf("FAIL - wrong ippLength(), %u instead of %u bytes!\n",
+             (unsigned)length, (unsigned)sizeof(collection));
       status = 1;
     }
     else
@@ -397,13 +397,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     if (state != IPP_STATE_DATA)
     {
-      printf("FAIL - %d bytes written.\n", (int)data.wused);
+      printf("FAIL - %u bytes written.\n", (unsigned)data.wused);
       status = 1;
     }
     else if (data.wused != sizeof(collection))
     {
-      printf("FAIL - wrote %d bytes, expected %d bytes!\n", (int)data.wused,
-             (int)sizeof(collection));
+      printf("FAIL - wrote %u bytes, expected %u bytes!\n", (unsigned)data.wused,
+             (unsigned)sizeof(collection));
       hex_dump("Bytes Written", data.wbuffer, data.wused);
       hex_dump("Baseline", collection, sizeof(collection));
       status = 1;
@@ -442,20 +442,20 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     if (state != IPP_STATE_DATA)
     {
-      printf("FAIL - %d bytes read.\n", (int)data.rpos);
+      printf("FAIL - %u bytes read.\n", (unsigned)data.rpos);
       status = 1;
     }
     else if (data.rpos != data.wused)
     {
-      printf("FAIL - read %d bytes, expected %d bytes!\n", (int)data.rpos,
-             (int)data.wused);
+      printf("FAIL - read %u bytes, expected %u bytes!\n", (unsigned)data.rpos,
+             (unsigned)data.wused);
       print_attributes(request, 8);
       status = 1;
     }
     else if (length != sizeof(collection))
     {
-      printf("FAIL - wrong ippLength(), %d instead of %d bytes!\n",
-             (int)length, (int)sizeof(collection));
+      printf("FAIL - wrong ippLength(), %u instead of %u bytes!\n",
+             (unsigned)length, (unsigned)sizeof(collection));
       print_attributes(request, 8);
       status = 1;
     }
@@ -694,20 +694,20 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     if (state != IPP_STATE_DATA)
     {
-      printf("FAIL - %d bytes read.\n", (int)data.rpos);
+      printf("FAIL - %u bytes read.\n", (unsigned)data.rpos);
       status = 1;
     }
     else if (data.rpos != sizeof(mixed))
     {
-      printf("FAIL - read %d bytes, expected %d bytes!\n", (int)data.rpos,
-             (int)sizeof(mixed));
+      printf("FAIL - read %u bytes, expected %u bytes!\n", (unsigned)data.rpos,
+             (unsigned)sizeof(mixed));
       print_attributes(request, 8);
       status = 1;
     }
     else if (length != (sizeof(mixed) + 4))
     {
-      printf("FAIL - wrong ippLength(), %d instead of %d bytes!\n",
-             (int)length, (int)sizeof(mixed) + 4);
+      printf("FAIL - wrong ippLength(), %u instead of %u bytes!\n",
+             (unsigned)length, (unsigned)sizeof(mixed) + 4);
       print_attributes(request, 8);
       status = 1;
     }
@@ -1017,18 +1017,18 @@ read_hex(cups_file_t *fp,		/* I - File to read from */
 
   while (total < bytes)
   {
-    if (!hexptr || (isspace(hexptr[0] & 255) && isspace(hexptr[1] & 255)))
+    if (!hexptr || (isspace(hexptr[0]) && isspace(hexptr[1])))
     {
       if (!cupsFileGets(fp, hex, sizeof(hex)))
         break;
 
       hexptr = hex;
-      while (isxdigit(*hexptr & 255))
+      while (isxdigit(*hexptr))
         hexptr ++;
-      while (isspace(*hexptr & 255))
+      while (isspace(*hexptr))
         hexptr ++;
 
-      if (!isxdigit(*hexptr & 255))
+      if (!isxdigit(*hexptr))
       {
         hexptr = NULL;
         continue;

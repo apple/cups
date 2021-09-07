@@ -330,7 +330,7 @@ extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize) _CUPS_PRIVATE;
 extern void		_httpFreeCredentials(http_tls_credentials_t credentials) _CUPS_PRIVATE;
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
-			                 size_t resolved_size, int options,
+			                 size_t resolved_size, unsigned options,
 					 int (*cb)(void *context),
 					 void *context) _CUPS_PRIVATE;
 extern int		_httpSetDigestAuthString(http_t *http, const char *nonce, const char *method, const char *resource) _CUPS_PRIVATE;

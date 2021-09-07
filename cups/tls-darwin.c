@@ -84,8 +84,8 @@ cupsMakeServerCredentials(
 {
 #if TARGET_OS_OSX
   int		pid,			/* Process ID of command */
-		status,			/* Status of command */
-		i;			/* Looping var */
+		status;			/* Status of command */
+	size_t i;			/* Looping var */
   char		command[1024],		/* Command */
 		*argv[5],		/* Command-line arguments */
 		*envp[1000],		/* Environment variables */
@@ -149,7 +149,7 @@ cupsMakeServerCredentials(
 
   snprintf(days, sizeof(days), "CERTTOOL_EXPIRATION_DAYS=%d", (int)((expiration_date - time(NULL) + 86399) / 86400));
   envp[0] = days;
-  for (i = 0; i < (int)(sizeof(envp) / sizeof(envp[0]) - 2) && environ[i]; i ++)
+  for (i = 0; i < (sizeof(envp) / sizeof(envp[0]) - 2) && environ[i]; i ++)
     envp[i + 1] = environ[i];
   envp[i] = NULL;
 
@@ -427,13 +427,12 @@ httpCopyCredentials(
     http_t	 *http,			/* I - Connection to server */
     cups_array_t **credentials)		/* O - Array of credentials */
 {
-  OSStatus		error;		/* Error code */
-  SecTrustRef		peerTrust;	/* Peer trust reference */
-  CFIndex		count;		/* Number of credentials */
-  SecCertificateRef	secCert;	/* Certificate reference */
-  CFDataRef		data;		/* Certificate data */
-  int			i;		/* Looping var */
-
+  OSStatus error;            /* Error code */
+  SecTrustRef peerTrust;     /* Peer trust reference */
+  CFIndex count;             /* Number of credentials */
+  SecCertificateRef secCert; /* Certificate reference */
+  CFDataRef data;            /* Certificate data */
+  CFIndex i;                 /* Looping var */
 
   DEBUG_printf(("httpCopyCredentials(http=%p, credentials=%p)", (void *)http, (void *)credentials));
 
@@ -445,7 +444,7 @@ httpCopyCredentials(
 
   if (!(error = SSLCopyPeerTrust(http->tls, &peerTrust)) && peerTrust)
   {
-    DEBUG_printf(("2httpCopyCredentials: Peer provided %d certificates.", (int)SecTrustGetCertificateCount(peerTrust)));
+    DEBUG_printf(("2httpCopyCredentials: Peer provided %ld certificates.", (long)SecTrustGetCertificateCount(peerTrust)));
 
     if ((*credentials = cupsArrayNew(NULL, NULL)) != NULL)
     {
@@ -463,7 +462,7 @@ httpCopyCredentials(
 	else
 	  strlcpy(name, "unknown", sizeof(name));
 
-	DEBUG_printf(("2httpCopyCredentials: Certificate %d name is \"%s\".", i, name));
+	DEBUG_printf(("2httpCopyCredentials: Certificate %ld name is \"%s\".", (long)i, name));
 #endif /* DEBUG */
 
 	if ((data = SecCertificateCopyData(secCert)) != NULL)
@@ -1229,7 +1228,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
   CFArrayRef		dn_array;	/* CF distinguished names array */
   CFIndex		count;		/* Number of credentials */
   CFDataRef		data;		/* Certificate data */
-  int			i;		/* Looping var */
+  CFIndex		i;		/* Looping var */
   http_credential_t	*credential;	/* Credential data */
 
 
@@ -1318,7 +1317,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
     {
       DEBUG_printf(("4_httpTLSStart: %d cipher suites supported.", (int)num_supported));
 
-      for (i = 0, num_enabled = 0; i < (int)num_supported && num_enabled < (sizeof(enabled) / sizeof(enabled[0])); i ++)
+      for (i = 0, num_enabled = 0; i < num_supported && num_enabled < (sizeof(enabled) / sizeof(enabled[0])); i ++)
       {
         switch (supported[i])
 	{
@@ -1522,7 +1521,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
       }
     }
 
-    if (isdigit(hostname[0] & 255) || hostname[0] == '[')
+    if (isdigit(hostname[0]) || hostname[0] == '[')
       hostname[0] = '\0';		/* Don't allow numeric addresses */
 
     if (hostname[0])
@@ -1808,7 +1807,7 @@ _httpTLSWrite(http_t     *http,		/* I - HTTP connection */
 	       const char *buf,		/* I - Buffer holding data */
 	       int        len)		/* I - Length of buffer */
 {
-  ssize_t	result;			/* Return value */
+  int	result;			      /* Return value */
   OSStatus	error;			/* Error info */
   size_t	processed;		/* Number of bytes processed */
 
@@ -1849,9 +1848,9 @@ _httpTLSWrite(http_t     *http,		/* I - HTTP connection */
 	break;
   }
 
-  DEBUG_printf(("3_httpTLSWrite: Returning %d.", (int)result));
+  DEBUG_printf(("3_httpTLSWrite: Returning %d.", result));
 
-  return ((int)result);
+  return (result);
 }
 
 

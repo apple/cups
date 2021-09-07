@@ -1062,7 +1062,7 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
       if (!*cur)
         cur --;
     }
-    else if (!isspace(*cur & 255))
+    else if (!isspace(*cur))
       break;
   }
 
@@ -1195,7 +1195,7 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 
             if (*cur == '>')
 	      break;
-	    else if (valptr >= valend || !isxdigit(*cur & 255))
+	    else if (valptr >= valend || !isxdigit(*cur))
 	    {
 	      *ptr = start;
 	      return (NULL);
@@ -1206,7 +1206,7 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 	    else
 	      ch = (tolower(*cur) - 'a' + 10) << 4;
 
-	    if (isxdigit(cur[1] & 255))
+	    if (isxdigit(cur[1]))
 	    {
 	      cur ++;
 
@@ -1256,7 +1256,7 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 
     case '-' :				/* Possible number */
     case '+' :
-        if (!isdigit(cur[1] & 255) && cur[1] != '.')
+        if (!isdigit(cur[1]) && cur[1] != '.')
 	{
 	  obj.type           = CUPS_PS_OTHER;
 	  obj.value.other[0] = *cur;
@@ -1280,7 +1280,7 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 
         start = cur;
 	for (cur ++; *cur; cur ++)
-	  if (!isdigit(*cur & 255))
+	  if (!isdigit(*cur))
 	    break;
 
         if (*cur == '#')
@@ -1292,7 +1292,7 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
           obj.value.number = strtol(cur + 1, &cur, atoi(start));
 	  break;
 	}
-	else if (strchr(".Ee()<>[]{}/%", *cur) || isspace(*cur & 255))
+	else if (strchr(".Ee()<>[]{}/%", *cur) || isspace(*cur))
 	{
 	 /*
 	  * Integer or real number...
@@ -1323,7 +1323,7 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 
 	while (*cur)
 	{
-	  if (strchr("()<>[]{}/%", *cur) || isspace(*cur & 255))
+	  if (strchr("()<>[]{}/%", *cur) || isspace(*cur))
 	    break;
 	  else if (valptr < valend)
 	    *valptr++ = *cur++;

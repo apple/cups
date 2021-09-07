@@ -700,7 +700,7 @@ pwgMediaForPPD(const char *ppd)		/* I - PPD size name */
     */
 
     units = strchr(ptr, '.');
-    while (units && isdigit(units[1] & 255))
+    while (units && isdigit(units[1]))
       units = strchr(units + 1, '.');
 
     if (units)
@@ -710,7 +710,7 @@ pwgMediaForPPD(const char *ppd)		/* I - PPD size name */
 
     if (units > ptr)
     {
-      if (isdigit(*units & 255) || *units == '.')
+      if (isdigit(*units) || *units == '.')
         units ++;
 
       if (!_cups_strncasecmp(units, "cm", 2))
@@ -835,8 +835,8 @@ pwgMediaForPWG(const char *pwg)		/* I - PWG size name */
 
   key.pwg = pwg;
   if ((size = (pwg_media_t *)cupsArrayFind(cg->pwg_size_lut, &key)) == NULL &&
-      (ptr = (char *)strchr(pwg, '_')) != NULL &&
-      (ptr = (char *)strchr(ptr + 1, '_')) != NULL)
+      (ptr = strchr(pwg, '_')) != NULL &&
+      (ptr = strchr(ptr + 1, '_')) != NULL)
   {
    /*
     * Try decoding the self-describing name of the form:

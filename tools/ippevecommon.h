@@ -7,6 +7,9 @@
  * information.
  */
 
+#ifndef _IPPEVECOMMON_H
+#define _IPPEVECOMMON_H
+
 /*
  * Include necessary headers...
  */
@@ -24,3 +27,5 @@
 /*
  * Prototypes...
  */
+
+#endif

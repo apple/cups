@@ -17,9 +17,9 @@
  * Include necessary headers...
  */
 
+#  include "pwg-private.h"
 #  include <cups/cups.h>
 #  include <cups/ppd.h>
-#  include "pwg-private.h"
 
 
 /*

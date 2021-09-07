@@ -1319,8 +1319,7 @@ cupsdSetString(char       **s,		/* O - New string */
   if (!s || *s == v)
     return;
 
-  if (*s)
-    free(*s);
+  free(*s);
 
   if (v)
     *s = strdup(v);
@@ -1359,8 +1358,7 @@ cupsdSetStringf(char       **s,		/* O - New string */
   else
     *s = NULL;
 
-  if (olds)
-    free(olds);
+  free(olds);
 }
 
 

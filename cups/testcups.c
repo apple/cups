@@ -62,7 +62,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
       for (i = 2; i < argc; i ++)
-        if (isdigit(argv[i][0] & 255) || argv[i][0] == '.')
+        if (isdigit(argv[i][0]) || argv[i][0] == '.')
           msec = (int)(atof(argv[i]) * 1000);
         else if (!_cups_strcasecmp(argv[i], "bw"))
         {

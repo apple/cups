@@ -382,13 +382,13 @@ add_device_uri(char *value)		/* I - Value from snmp.conf */
 
   while (*value)
   {
-    while (isspace(*value & 255))
+    while (isspace(*value))
       value ++;
 
     if (!*value)
       break;
 
-    for (start = value; *value && !isspace(*value & 255); value ++);
+    for (start = value; *value && !isspace(*value); value ++);
 
     if (*value)
       *value++ = '\0';
@@ -487,14 +487,14 @@ fix_make_model(
 
     mmptr = (char *)old_make_model + 15;
 
-    while (isspace(*mmptr & 255))
+    while (isspace(*mmptr))
       mmptr ++;
 
     if (!_cups_strncasecmp(mmptr, "hp", 2))
     {
       mmptr += 2;
 
-      while (isspace(*mmptr & 255))
+      while (isspace(*mmptr))
 	mmptr ++;
     }
 
@@ -576,14 +576,11 @@ free_cache(void)
   {
     free(cache->addrname);
 
-    if (cache->uri)
-      free(cache->uri);
+    free(cache->uri);
 
-    if (cache->id)
-      free(cache->id);
+    free(cache->id);
 
-    if (cache->make_and_model)
-      free(cache->make_and_model);
+    free(cache->make_and_model);
 
     free(cache);
   }
@@ -1010,12 +1007,11 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 	    backendGetMakeModel((char *)packet.object_value.string.bytes,
 				make_model, sizeof(make_model));
 
-            if (device->info)
-	      free(device->info);
+      free(device->info);
 
-	    device->info = strdup(make_model);
-	  }
-	  else
+      device->info = strdup(make_model);
+    }
+    else
 	  {
 	   /*
 	    * Description is plain text...
@@ -1024,10 +1020,9 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 	    fix_make_model(make_model, (char *)packet.object_value.string.bytes,
 			   sizeof(make_model));
 
-            if (device->info)
-	      free(device->info);
+      free(device->info);
 
-	    device->info = strdup((char *)packet.object_value.string.bytes);
+      device->info = strdup((char *)packet.object_value.string.bytes);
 	  }
 
 	  if (!device->make_and_model)
@@ -1039,34 +1034,32 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING &&
 	    (!device->id ||
 	     strlen(device->id) < packet.object_value.string.num_bytes))
-	{
-	 /*
+  {
+   /*
 	  * Update an existing cache entry...
 	  */
 
-	  char	make_model[256];	/* Make and model */
-          char *ptr;			/* Pointer into device ID */
+    char make_model[256]; /* Make and model */
+    char *ptr;            /* Pointer into device ID */
 
-          for (ptr = (char *)packet.object_value.string.bytes; *ptr; ptr ++)
-            if (*ptr == '\n')
-              *ptr = ';';		/* A lot of bad printers put a newline */
-	  if (device->id)
-	    free(device->id);
+    for (ptr = (char *)packet.object_value.string.bytes; *ptr; ptr++)
+      if (*ptr == '\n')
+        *ptr = ';'; /* A lot of bad printers put a newline */
+    free(device->id);
 
-	  device->id = strdup((char *)packet.object_value.string.bytes);
+    device->id = strdup((char *)packet.object_value.string.bytes);
 
-	 /*
+   /*
 	  * Convert the ID to a make and model string...
 	  */
 
-	  backendGetMakeModel((char *)packet.object_value.string.bytes,
-	                      make_model, sizeof(make_model));
-	  if (device->make_and_model)
-	    free(device->make_and_model);
+    backendGetMakeModel((char *)packet.object_value.string.bytes,
+                        make_model, sizeof(make_model));
+    free(device->make_and_model);
 
-	  device->make_and_model = strdup(make_model);
-	}
-	break;
+    device->make_and_model = strdup(make_model);
+  }
+  break;
 
     case DEVICE_LOCATION :
 	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING &&
@@ -1077,20 +1070,19 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
     case DEVICE_PRODUCT :
 	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING &&
 	    !device->id)
-	{
-	 /*
+  {
+   /*
 	  * Update an existing cache entry...
 	  */
 
-          if (!device->info)
-	    device->info = strdup((char *)packet.object_value.string.bytes);
+    if (!device->info)
+      device->info = strdup((char *)packet.object_value.string.bytes);
 
-          if (device->make_and_model)
-	    free(device->make_and_model);
+    free(device->make_and_model);
 
-	  device->make_and_model = strdup((char *)packet.object_value.string.bytes);
-	}
-	break;
+    device->make_and_model = strdup((char *)packet.object_value.string.bytes);
+  }
+  break;
 
     case DEVICE_URI :
 	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING &&
@@ -1339,23 +1331,20 @@ update_cache(snmp_cache_t *device,	/* I - Device */
 	     const char   *id,		/* I - Device ID */
 	     const char   *make_model)	/* I - Device make and model */
 {
-  if (device->uri)
-    free(device->uri);
+  free(device->uri);
 
   device->uri = strdup(uri);
 
   if (id)
   {
-    if (device->id)
-      free(device->id);
+    free(device->id);
 
     device->id = strdup(id);
   }
 
   if (make_model)
   {
-    if (device->make_and_model)
-      free(device->make_and_model);
+    free(device->make_and_model);
 
     device->make_and_model = strdup(make_model);
   }

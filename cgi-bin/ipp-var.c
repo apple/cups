@@ -43,7 +43,7 @@ cgiGetAttributes(ipp_t      *request,	/* I - IPP request */
   if ((lang = getenv("LANG")) != NULL)
   {
     for (i = 0; lang[i] && i < 15; i ++)
-      if (isalnum(lang[i] & 255))
+      if (isalnum(lang[i]))
         locale[i] = (char)tolower(lang[i]);
       else
         locale[i] = '_';

@@ -43,7 +43,7 @@ cupsdCompareNames(const char *s,	/* I - First string */
 
   while (*s && *t)
   {
-    if (isdigit(*s & 255) && isdigit(*t & 255))
+    if (isdigit(*s) && isdigit(*t))
     {
      /*
       * Got a number; start by skipping leading 0's...
@@ -58,7 +58,7 @@ cupsdCompareNames(const char *s,	/* I - First string */
       * Skip equal digits...
       */
 
-      while (isdigit(*s & 255) && *s == *t)
+      while (isdigit(*s) && *s == *t)
       {
         s ++;
 	t ++;
@@ -68,11 +68,11 @@ cupsdCompareNames(const char *s,	/* I - First string */
       * Bounce out if *s and *t aren't both digits...
       */
 
-      if (isdigit(*s & 255) && !isdigit(*t & 255))
+      if (isdigit(*s) && !isdigit(*t))
         return (1);
-      else if (!isdigit(*s & 255) && isdigit(*t & 255))
+      else if (!isdigit(*s) && isdigit(*t))
         return (-1);
-      else if (!isdigit(*s & 255) || !isdigit(*t & 255))
+      else if (!isdigit(*s) || !isdigit(*t))
         continue;
 
       if (*s < *t)
@@ -88,13 +88,13 @@ cupsdCompareNames(const char *s,	/* I - First string */
       s ++;
       t ++;
 
-      while (isdigit(*s & 255))
+      while (isdigit(*s))
       {
         digits ++;
 	s ++;
       }
 
-      while (isdigit(*t & 255))
+      while (isdigit(*t))
       {
         digits --;
 	t ++;

@@ -7,6 +7,9 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _AUTH_H
+#  define _AUTH_H
+
 /*
  * Include necessary headers...
  */
@@ -134,3 +137,5 @@ extern cupsd_location_t	*cupsdFindLocation(const char *location);
 extern void		cupsdFreeLocation(cupsd_location_t *loc);
 extern http_status_t	cupsdIsAuthorized(cupsd_client_t *con, const char *owner);
 extern cupsd_location_t	*cupsdNewLocation(const char *location);
+
+#endif

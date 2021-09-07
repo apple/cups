@@ -2206,7 +2206,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - URI of printer */
 {
   http_status_t	status;			/* Policy status */
-  int		i;			/* Looping var */
+  int		i = 0;			/* Looping var */
   char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
@@ -2446,7 +2446,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
                                  IPP_TAG_NAME);
     if (supported)
     {
-      for (i = 0; i < supported->num_values; i ++)
+      for (; i < supported->num_values; i ++)
         if (!strcmp(supported->values[i].string.text,
                     attr->values[0].string.text))
           break;
@@ -4168,8 +4168,8 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
     */
 
     attrname[2] = '_';
-    attrname[3] = (char)toupper(attrname[3] & 255);
-    attrname[4] = (char)toupper(attrname[4] & 255);
+    attrname[3] = (char)toupper(attrname[3]);
+    attrname[4] = (char)toupper(attrname[4]);
   }
 
   snprintf(filename, sizeof(filename), "%s/banners/%s/%s", DataDir,
@@ -4220,7 +4220,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
       */
 
       for (s = attrname; (ch = cupsFileGetChar(in)) != EOF;)
-        if (!isalpha(ch & 255) && ch != '-' && ch != '?')
+        if (!isalpha(ch) && ch != '-' && ch != '?')
           break;
 	else if (s < (attrname + sizeof(attrname) - 1))
           *s++ = (char)ch;
@@ -8378,7 +8378,7 @@ ppd_parse_line(const char *line,	/* I - Line */
   * Now grab the option choice, skipping leading whitespace...
   */
 
-  while (isspace(*line & 255))
+  while (isspace(*line))
     line ++;
 
   for (clen --;
@@ -8442,7 +8442,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 #ifdef HAVE_LIBZ
         && strcmp(attr->values[0].string.text, "gzip")
 #endif /* HAVE_LIBZ */
-      )
+     )
     {
       send_ipp_status(con, IPP_ATTRIBUTES,
                       _("Unsupported compression \"%s\"."),
@@ -9691,7 +9691,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 #ifdef HAVE_LIBZ
         && strcmp(attr->values[0].string.text, "gzip")
 #endif /* HAVE_LIBZ */
-      )
+     )
     {
       send_ipp_status(con, IPP_ATTRIBUTES, _("Unsupported compression \"%s\"."),
         	      attr->values[0].string.text);
@@ -11271,7 +11271,7 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
 #ifdef HAVE_LIBZ
         && strcmp(attr->values[0].string.text, "gzip")
 #endif /* HAVE_LIBZ */
-      )
+     )
     {
       send_ipp_status(con, IPP_ATTRIBUTES,
                       _("Unsupported 'compression' value \"%s\"."),

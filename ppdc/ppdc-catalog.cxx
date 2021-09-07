@@ -166,7 +166,7 @@ ppdcCatalog::~ppdcCatalog()
 void
 ppdcCatalog::add_message(
     const char *id,			// I - Message ID to add
-    const char *string)			// I - Translation string
+    const char *string)	const		// I - Translation string
 {
   ppdcMessage	*m;			// Current message
   char		text[1024];		// Text to translate
@@ -207,7 +207,7 @@ ppdcCatalog::add_message(
 
 const char *				// O - Message text
 ppdcCatalog::find_message(
-    const char *id)			// I - Message ID
+    const char *id) const			// I - Message ID
 {
   ppdcMessage	*m;			// Current message
 
@@ -231,7 +231,7 @@ ppdcCatalog::find_message(
 
 int					// O - 0 on success, -1 on failure
 ppdcCatalog::load_messages(
-    const char *f)			// I - Message catalog file
+    const char *f) const			// I - Message catalog file
 {
   cups_file_t	*fp;			// Message file
   char		line[4096],		// Line buffer
@@ -516,7 +516,7 @@ ppdcCatalog::load_messages(
 
 int					// O - 0 on success, -1 on error
 ppdcCatalog::save_messages(
-    const char *f)			// I - File to save to
+    const char *f) const		// I - File to save to
 {
   cups_file_t	*fp;			// Message file
   ppdcMessage	*m;			// Current message

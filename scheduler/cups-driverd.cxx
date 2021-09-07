@@ -2079,21 +2079,21 @@ load_ppd(const char  *filename,		/* I - Real filename */
       char	*start;			/* Start of language */
 
 
-      for (start = line + 15; *start && isspace(*start & 255); start ++);
+      for (start = line + 15; *start && isspace(*start); start ++);
 
       if (*start++ == '\"')
       {
 	while (*start)
 	{
 	  for (ptr = start + 1;
-	       *ptr && *ptr != '\"' && !isspace(*ptr & 255);
+	       *ptr && *ptr != '\"' && !isspace(*ptr);
 	       ptr ++);
 
 	  if (*ptr)
 	  {
 	    *ptr++ = '\0';
 
-	    while (isspace(*ptr & 255))
+	    while (isspace(*ptr))
 	      *ptr++ = '\0';
 	  }
 
@@ -2104,7 +2104,7 @@ load_ppd(const char  *filename,		/* I - Real filename */
     }
     else if (!strncmp(line, "*cupsFax:", 9))
     {
-      for (ptr = line + 9; isspace(*ptr & 255); ptr ++);
+      for (ptr = line + 9; isspace(*ptr); ptr ++);
 
       if (!_cups_strncasecmp(ptr, "true", 4))
 	type = PPD_TYPE_FAX;
@@ -2145,7 +2145,7 @@ load_ppd(const char  *filename,		/* I - Real filename */
   else
     strlcpy(make_model, model_name, sizeof(make_model));
 
-  while (isspace(make_model[0] & 255))
+  while (isspace(make_model[0]))
     _cups_strcpy(make_model, make_model + 1);
 
   if (!make_model[0] || cupsArrayCount(products) == 0 ||
@@ -2179,7 +2179,7 @@ load_ppd(const char  *filename,		/* I - Real filename */
   * Normalize the make and model string...
   */
 
-  while (isspace(manufacturer[0] & 255))
+  while (isspace(manufacturer[0]))
     _cups_strcpy(manufacturer, manufacturer + 1);
 
   if (!_cups_strncasecmp(make_model, manufacturer, strlen(manufacturer)))
@@ -2399,7 +2399,12 @@ load_ppds(const char *d,		/* I - Actual directory */
   * Nope, add it to the Inodes array and continue...
   */
 
-  dinfoptr = (struct stat *)malloc(sizeof(struct stat));
+  if ((dinfoptr = (struct stat *)malloc(sizeof(struct stat))) == NULL)
+  {
+    fputs("ERROR: [cups-driverd] Unable to allocate memory for directory info.\n",
+          stderr);
+    exit(1);
+  }
   memcpy(dinfoptr, &dinfo, sizeof(struct stat));
   cupsArrayAdd(Inodes, dinfoptr);
 
@@ -2619,15 +2624,14 @@ load_ppds_dat(char   *filename,		/* I - Filename buffer */
 
       for (; num_ppds > 0; num_ppds --)
       {
-	if ((ppd = (ppd_info_t *)calloc(1, sizeof(ppd_info_t))) == NULL)
-	{
-	  if (verbose)
-	    fputs("ERROR: [cups-driverd] Unable to allocate memory for PPD!\n",
-		  stderr);
-	  exit(1);
-	}
+        if ((ppd = (ppd_info_t *)calloc(1, sizeof(ppd_info_t))) == NULL)
+        {
+          fputs("ERROR: [cups-driverd] Unable to allocate memory for PPD.\n",
+                stderr);
+          exit(1);
+        }
 
-	if (cupsFileRead(fp, (char *)&(ppd->record), sizeof(ppd_rec_t)) > 0)
+  if (cupsFileRead(fp, (char *)&(ppd->record), sizeof(ppd_rec_t)) > 0)
 	{
 	  cupsArrayAdd(PPDsByName, ppd);
 	  cupsArrayAdd(PPDsByMakeModel, ppd);

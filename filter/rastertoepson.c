@@ -48,8 +48,7 @@
 unsigned char	*Planes[6],		/* Output buffers */
 		*CompBuffer,		/* Compression buffer */
 		*LineBuffers[2];	/* Line bitmap buffers */
-int		Model,			/* Model number */
-		EjectPage,		/* Eject the page when done? */
+int		Model,            /* Model number */
 		Shingling,		/* Shingle output? */
 		Canceled;		/* Has the current job been canceled? */
 unsigned	NumPlanes,		/* Number of color planes */
@@ -361,8 +360,7 @@ EndPage(
 
   free(Planes[0]);
 
-  if (CompBuffer)
-    free(CompBuffer);
+  free(CompBuffer);
 
   if (DotBytes)
     free(LineBuffers[0]);
@@ -414,7 +412,7 @@ CompressData(const unsigned char *line,	/* I - Data to compress */
         		*start;		/* Start of compression sequence */
   unsigned char      	*comp_ptr,	/* Pointer into compression buffer */
 			temp;		/* Current byte */
-  int   	        count;		/* Count of bytes for output */
+  size_t   	    count;		/* Count of bytes for output */
   static int		ctable[6] = { 0, 2, 1, 4, 18, 17 };
 					/* KCMYcm color values */
 
@@ -537,7 +535,7 @@ CompressData(const unsigned char *line,	/* I - Data to compress */
 
 	    *comp_ptr++ = (unsigned char)(count - 1);
 
-	    memcpy(comp_ptr, start, (size_t)count);
+	    memcpy(comp_ptr, start, count);
 	    comp_ptr += count;
 	  }
 	}
@@ -877,7 +875,7 @@ OutputRows(
 
     n = dot_count / DotBytes;
     putchar((int)(n & 255));
-    putchar((int)(n / 256));
+    putchar((int)(n >> 8));
 
    /*
     * Write the graphics data...
@@ -918,9 +916,9 @@ OutputRows(
       else
       	printf("\033*\003");		/* Select bit image */
 
-      n = (unsigned)dot_count / DotBytes;
+      n = dot_count / DotBytes;
       putchar((int)(n & 255));
-      putchar((int)(n / 256));
+      putchar((int)(n >> 8));
 
       for (n = dot_count / 2, ptr = dot_ptr + 1; n > 0; n --, ptr += 2)
       {
@@ -955,7 +953,7 @@ OutputRows(
   * Clear the buffer...
   */
 
-  memset(LineBuffers[row], 0, header->cupsWidth * DotBytes);
+  memset(LineBuffers[row], 0, (size_t)header->cupsWidth * (size_t)DotBytes);
 }
 
 

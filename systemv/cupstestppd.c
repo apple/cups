@@ -585,7 +585,7 @@ main(int  argc,				/* I - Number of command-line args */
       if ((attr = ppdFindAttr(ppd, "FileVersion", NULL)) != NULL)
       {
         for (ptr = attr->value; *ptr; ptr ++)
-	  if (!isdigit(*ptr & 255) && *ptr != '.')
+	  if (!isdigit(*ptr) && *ptr != '.')
 	    break;
 
 	if (*ptr)
@@ -628,7 +628,7 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 
 	  for (ptr += 2; *ptr; ptr ++)
-	    if (!isdigit(*ptr & 255))
+	    if (!isdigit(*ptr))
 	      break;
         }
 
@@ -762,7 +762,7 @@ main(int  argc,				/* I - Number of command-line args */
       if (ppd->modelname != NULL)
       {
         for (ptr = ppd->modelname; *ptr; ptr ++)
-	  if (!isalnum(*ptr & 255) && !strchr(" ./-+", *ptr))
+	  if (!isalnum(*ptr) && !strchr(" ./-+", *ptr))
 	    break;
 
 	if (*ptr)
@@ -1833,20 +1833,20 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
         * Extract "*Option Choice" or just "*Option"...
 	*/
 
-        for (vptr ++, ptr = option; *vptr && !isspace(*vptr & 255); vptr ++)
+        for (vptr ++, ptr = option; *vptr && !isspace(*vptr); vptr ++)
 	  if (ptr < (option + sizeof(option) - 1))
 	    *ptr++ = *vptr;
 
         *ptr = '\0';
 
-        while (isspace(*vptr & 255))
+        while (isspace(*vptr))
 	  vptr ++;
 
         if (*vptr == '*')
 	  choice[0] = '\0';
 	else
 	{
-	  for (ptr = choice; *vptr && !isspace(*vptr & 255); vptr ++)
+	  for (ptr = choice; *vptr && !isspace(*vptr); vptr ++)
 	    if (ptr < (choice + sizeof(choice) - 1))
 	      *ptr++ = *vptr;
 
@@ -3307,11 +3307,11 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
 	  ptr = size->name + ppdlen;
 
-	  if (isdigit(*ptr & 255))
+	  if (isdigit(*ptr))
           {
             for (ptr ++; *ptr; ptr ++)
             {
-              if (!isdigit(*ptr & 255))
+              if (!isdigit(*ptr))
 	      {
                 is_ok = 0;
 		break;
@@ -3343,10 +3343,10 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
       }
       else
       {
-        width_tmp  = (fabs(size->width - ceil(size->width)) < 0.1) ?
-	                 ceil(size->width) : size->width;
-        length_tmp = (fabs(size->length - ceil(size->length)) < 0.1) ?
-	                 ceil(size->length) : size->length;
+        width_tmp  = (fabs(size->width - ceilf(size->width)) < 0.1f) ?
+	                 ceilf(size->width) : size->width;
+        length_tmp = (fabs(size->length - ceilf(size->length)) < 0.1f) ?
+	                 ceilf(size->length) : size->length;
 
         if (fmod(width_tmp, 9.0) == 0.0 && fmod(length_tmp, 9.0) == 0.0)
         {
