@@ -813,8 +813,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   Shutdown();
 
-  if (ppd)
-    ppdClose(ppd);
+  ppdClose(ppd);
 
  /*
   * Close the raster stream...

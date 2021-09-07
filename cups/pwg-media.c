@@ -448,13 +448,13 @@ pwgInitSize(pwg_size_t *size,		/* I - Size to initialize */
         size->width  = x_dimension->values[0].integer;
 	size->length = y_dimension->values[0].integer;
       }
-      else if (!x_dimension)
+      else if (!x_dimension) /* x_dimension is missing */
       {
 	_cupsSetError(IPP_STATUS_ERROR_INTERNAL,
 		      _("Missing x-dimension in media-size."), 1);
         return (0);
       }
-      else if (!y_dimension)
+      else /* y_dimension must be missing */
       {
 	_cupsSetError(IPP_STATUS_ERROR_INTERNAL,
 		      _("Missing y-dimension in media-size."), 1);

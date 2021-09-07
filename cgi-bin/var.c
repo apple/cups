@@ -304,7 +304,7 @@ cgiInitialize(void)
     if (boundary)
       boundary += 9;
 
-    if (content_type && !strncmp(content_type, "multipart/form-data; ", 21))
+    if (!strncmp(content_type, "multipart/form-data; ", 21))
     {
       if (!cgi_initialize_multipart(boundary))
         return (0);
