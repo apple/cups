@@ -3,7 +3,7 @@
 # Perform the complete set of IPP compliance tests specified in the
 # CUPS Software Test Plan.
 #
-# Copyright © 2007-2019 by Apple Inc.
+# Copyright © 2007-2021 by Apple Inc.
 # Copyright © 1997-2007 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -356,6 +356,7 @@ cat >$BASE/share/banners/classified <<EOF
 EOF
 ln -s $root/data $BASE/share
 ln -s $root/ppdc/sample.drv $BASE/share/drv
+ln -s $root/conf/cgi.types $BASE/share/mime
 ln -s $root/conf/mime.types $BASE/share/mime
 ln -s $root/conf/mime.convs $BASE/share/mime
 ln -s $root/data/*.h $BASE/share/ppdc

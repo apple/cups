@@ -1,82 +1,41 @@
-<HTML>
+<!DOCTYPE html>
+<html>
 <!-- SECTION: Getting Started -->
-<HEAD>
-	<TITLE>Using CGI Programs</TITLE>
-	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
-</HEAD>
-<BODY>
+  <head>
+    <title>Using CGI Programs</title>
+    <link rel="stylesheet" type="text/css" href="../cups-printable.css">
+  </head>
+  <body>
+    <h1 class="title">Using CGI Programs</h1>
 
-<H1 CLASS="title">Using CGI Programs</H1>
+    <p>CUPS provides a dynamic web interface through dedicated CGI programs that are executed when users open special directories on the CUPS server. Each CGI performs administration, class, help, job, and printer functions as directed by the user, but the actual programs that are run and functions that are available are limited to those that were originally designed into the scheduler.</p>
 
-<P>CUPS provides a dynamic web interface through dedicated CGI programs that
-are executed when users open special directories on the CUPS server. Each CGI
-performs administration, class, help, job, and printer functions as directed by
-the user, but the actual programs that are run and functions that are available
-are limited to those that were originally designed into the scheduler.</P>
+    <p>CUPS also supports CGI scripts/programs for pages you want to provide, although this functionality is disabled by default. The "application/x-httpd-cgi" MIME media type is used to identify CGI content and can be associated with any filename extension. The scheduler requires CGI content to have the execute bit set, not have world or group write permissions, and any CGI scripts need to include a <tt>#!</tt> line as the first line of a script to identify the script interpreter. For example, a PHP script would look like:</p>
 
-<P>CUPS also supports CGI programs and specific scripting languages (Java, Perl,
-PHP, and Python) for pages you want to provide.  The interpreters for these
-languages are currently configured at compile time and are associated with
-MIME media types. <a href="#TABLE1">Table 1</a> shows the MIME media types that
-are reserved for each type of page and are the same as those used by the Apache
-web server.</P>
+    <pre class="example">
+#!/usr/bin/php -fn
+&lt;?php
+...
+?&gt;
+</pre>
 
-<DIV CLASS="table"><TABLE SUMMARY="CGI MIME Media Types">
-<CAPTION><A NAME="TABLE1">Table 1</A>: CGI MIME Media Types</CAPTION>
-<TR>
-	<TH>MIME Media Type</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD>application/x-httpd-cgi</TD>
-	<TD>CGI script/program</TD>
-</TR>
-<TR>
-	<TD>application/x-httpd-java</TD>
-	<TD>Java program</TD>
-</TR>
-<TR>
-	<TD>application/x-httpd-perl</TD>
-	<TD>Perl script</TD>
-</TR>
-<TR>
-	<TD>application/x-httpd-php</TD>
-	<TD>PHP script</TD>
-</TR>
-<TR>
-	<TD>application/x-httpd-python</TD>
-	<TD>Python script</TD>
-</TR>
-</TABLE></DIV>
 
-<H2><A NAME="CONFIG">Configuring the Server</A></H2>
+    <h2><a name="CONFIG">Configuring the Server</a></h2>
 
-<P>In order to enable the corresponding type, you must create a
-new <VAR>/etc/cups/cgi.types</VAR> file which maps the filename
-extensions to the appropriate MIME types, for example:</P>
+    <p>In order to enable the corresponding type, you must create a new <var>/etc/cups/cgi.types</var> file which maps the filename extensions you use to the appropriate MIME types. For example, the following will support CGI programs/scripts with the "cgi" extension:</p>
 
-<PRE CLASS="command">
+    <pre class="command">
 application/x-httpd-cgi cgi
-application/x-httpd-java class
-application/x-httpd-perl pl
-application/x-httpd-php php
-application/x-httpd-python py
-</PRE>
+</pre>
 
-<P>CGI scripts/programs (application/x-httpd-cgi) also must be owned by root, have execution permissions, and not have world or group write permissions to be treated as a CGI script or program.</P>
 
-<H2><A NAME="LIMITS">Limitations</A></H2>
+    <h2><a name="LIMITS">Limitations</a></h2>
 
-<P>CUPS implements most of the CGI/1.1 specification, with the
-following exceptions:</P>
+    <p>CUPS implements most of the CGI/1.1 specification, with the following exceptions:</p>
 
-<UL>
-
-	<LI>No PATH_INFO or PATH_TRANSLATED support</LI>
-
-	<LI>Limited HTTP field support; only the Content-Length (CONTENT_LENGTH), Content-Type (CONTENT_TYPE), Cookie (HTTP_COOKIE), Referrer (HTTP_REFERRER), and User-Agent (HTTP_USER_AGENT) fields are placed in environment variables at this time</LI>
-
-</UL>
-
-</BODY>
-</HTML>
+    <ul>
+      <li>No PATH_INFO or PATH_TRANSLATED support</li>
+      <li>Limited HTTP field support; only the Content-Length (<tt>CONTENT_LENGTH</tt>), Content-Type (<tt>CONTENT_TYPE</tt>), Cookie (<tt>HTTP_COOKIE</tt>), Referrer (<tt>HTTP_REFERRER</tt>), and User-Agent (<tt>HTTP_USER_AGENT</tt>) fields are placed in environment variables at this time</li>
+    </ul>
+  </body>
+</html>

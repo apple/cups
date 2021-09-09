@@ -2,7 +2,7 @@
  * Client routines for the CUPS scheduler.
  *
  * Copyright © 2021 by OpenPrinting.
- * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 2007-2021 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -3120,8 +3120,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     return (0);
   }
 
-  if (!_cups_strcasecmp(type->type, "x-httpd-cgi") &&
-      (filestats->st_mode & 0111))
+  if (!_cups_strcasecmp(type->type, "x-httpd-cgi") && (filestats->st_mode & 0111) && (getuid() || !(filestats->st_mode & 022)))
   {
    /*
     * "application/x-httpd-cgi" is a CGI script.
