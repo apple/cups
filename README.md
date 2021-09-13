@@ -1,5 +1,10 @@
-README - CUPS v2.3.5 - 2021-04-26
-=================================
+README - Apple CUPS v2.3.5 - 2021-09-13
+=======================================
+
+> Note: Apple CUPS is the version of CUPS that is shipped with macOS and iOS.
+> For the current version of CUPS that is used on other operating systems, see
+> <https://openprinting.github.io/cups> for details.
+
 
 INTRODUCTION
 ------------
