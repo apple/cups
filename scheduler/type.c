@@ -193,7 +193,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 
   while (*rule != '\0')
   {
-    while (isspace(*rule & 255))
+    while (isspace(*rule))
       rule ++;
 
     if (*rule == '(')
@@ -305,14 +305,14 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
       invert = 1;
       rule ++;
     }
-    else if (isalnum(*rule & 255))
+    else if (isalnum(*rule))
     {
      /*
       * Read an extension name or a function...
       */
 
       ptr = name;
-      while (isalnum(*rule & 255) && (size_t)(ptr - name) < (sizeof(name) - 1))
+      while (isalnum(*rule) && (size_t)(ptr - name) < (sizeof(name) - 1))
         *ptr++ = *rule++;
 
       *ptr = '\0';
@@ -333,7 +333,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  while ((size_t)(ptr - value[num_values]) < (sizeof(value[0]) - 1) &&
 	         *rule != '\0' && *rule != ',' && *rule != ')')
 	  {
-	    if (isspace(*rule & 255))
+	    if (isspace(*rule))
 	    {
 	     /*
 	      * Ignore whitespace...
@@ -366,7 +366,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	      while (*rule != '>' && *rule != '\0' &&
 	             (size_t)(ptr - value[num_values]) < (sizeof(value[0]) - 1))
 	      {
-	        if (isxdigit(rule[0] & 255) && isxdigit(rule[1] & 255))
+	        if (isxdigit(rule[0]) && isxdigit(rule[1]))
 		{
 		  if (isdigit(*rule))
 		    *ptr = (char)((*rule++ - '0') << 4);

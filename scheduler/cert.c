@@ -72,7 +72,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
   snprintf(filename, sizeof(filename), "%s/certs/%d", StateDir, pid);
   unlink(filename);
 
-  if ((fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0400)) < 0)
+  if ((fd = open(filename, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0400)) < 0)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to create certificate file %s - %s",
@@ -377,7 +377,7 @@ cupsdInitCerts(void)
   * the current time, as available...
   */
 
-  if ((fp = cupsFileOpen("/dev/urandom", "rb")) == NULL)
+  if ((fp = cupsFileOpen("/dev/urandom", "rbe")) == NULL)
   {
     struct timeval tod;			/* Time of day */
 

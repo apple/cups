@@ -1133,7 +1133,7 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
       open_pipe(filterfds[1 - current]);
     else if (outfile)
     {
-      filterfds[1 - current][1] = open(outfile, O_CREAT | O_TRUNC | O_WRONLY,
+      filterfds[1 - current][1] = open(outfile, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC,
                                        0666);
 
       if (filterfds[1 - current][1] < 0)

@@ -117,7 +117,7 @@ cupsMakeServerCredentials(
     gnutls_x509_privkey_deinit(key);
     return (0);
   }
-  else if ((fp = cupsFileOpen(keyfile, "w")) != NULL)
+  else if ((fp = cupsFileOpen(keyfile, "we")) != NULL)
   {
     DEBUG_printf(("1cupsMakeServerCredentials: Writing private key to \"%s\".", keyfile));
     cupsFileWrite(fp, (char *)buffer, bytes);
@@ -216,7 +216,7 @@ cupsMakeServerCredentials(
     gnutls_x509_privkey_deinit(key);
     return (0);
   }
-  else if ((fp = cupsFileOpen(crtfile, "w")) != NULL)
+  else if ((fp = cupsFileOpen(crtfile, "we")) != NULL)
   {
     DEBUG_printf(("1cupsMakeServerCredentials: Writing public key and X.509 certificate to \"%s\".", crtfile));
     cupsFileWrite(fp, (char *)buffer, bytes);
@@ -734,7 +734,7 @@ httpLoadCredentials(
 
   http_gnutls_make_path(filename, sizeof(filename), path, common_name, "crt");
 
-  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+  if ((fp = cupsFileOpen(filename, "re")) == NULL)
     return (-1);
 
   while (cupsFileGets(fp, line, sizeof(line)))
@@ -864,7 +864,7 @@ httpSaveCredentials(
   http_gnutls_make_path(filename, sizeof(filename), path, common_name, "crt");
   snprintf(nfilename, sizeof(nfilename), "%s.N", filename);
 
-  if ((fp = cupsFileOpen(nfilename, "w")) == NULL)
+  if ((fp = cupsFileOpen(nfilename, "we")) == NULL)
     return (-1);
 
   fchmod(cupsFileNumber(fp), 0600);
@@ -995,7 +995,7 @@ http_gnutls_load_crl(void)
 
     http_gnutls_make_path(filename, sizeof(filename), CUPS_SERVERROOT, "site", "crl");
 
-    if ((fp = cupsFileOpen(filename, "r")) != NULL)
+    if ((fp = cupsFileOpen(filename, "re")) != NULL)
     {
       while (cupsFileGets(fp, line, sizeof(line)))
       {
@@ -1401,7 +1401,7 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
       }
     }
 
-    if (isdigit(hostname[0] & 255) || hostname[0] == '[')
+    if (isdigit(hostname[0]) || hostname[0] == '[')
       hostname[0] = '\0';		/* Don't allow numeric addresses */
 
     if (hostname[0])

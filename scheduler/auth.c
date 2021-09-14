@@ -218,7 +218,7 @@ cupsdAddNameMask(cups_array_t **masks,	/* IO - Masks array (created as needed) *
       name ++;
 
     temp.type             = CUPSD_AUTH_NAME;
-    temp.mask.name.name   = (char *)name;
+    temp.mask.name.name   = name;
   }
 
  /*
@@ -322,7 +322,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     */
 
     authorization += 8;
-    while (isspace(*authorization & 255))
+    while (isspace(*authorization))
       authorization ++;
 
     authlen = sizeof(authdata);
@@ -481,7 +481,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     */
 
     authorization += 5;
-    while (isspace(*authorization & 255))
+    while (isspace(*authorization))
       authorization ++;
 
     if ((localuser = cupsdFindCert(authorization)) == NULL)
@@ -505,7 +505,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
 
     authorization += 5;
-    while (isspace(*authorization & 255))
+    while (isspace(*authorization))
       authorization ++;
 
     userlen = sizeof(username);
@@ -743,7 +743,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     */
 
     authorization += 9;
-    while (isspace(*authorization & 255))
+    while (isspace(*authorization))
       authorization ++;
 
     if (!*authorization)

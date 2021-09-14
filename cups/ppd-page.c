@@ -371,7 +371,7 @@ ppdPageLength(ppd_file_t *ppd,	/* I - PPD file */
 
 
   if ((size = ppdPageSize(ppd, name)) == NULL)
-    return (0.0);
+    return (0.0f);
   else
     return (size->length);
 }

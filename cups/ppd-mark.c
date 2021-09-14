@@ -290,7 +290,7 @@ cupsMarkOptions(
         * Get the next finishings number...
 	*/
 
-        if (!isdigit(*ptr & 255))
+        if (!isdigit(*ptr))
 	  break;
 
         if ((j = (int)strtol(ptr, &ptr, 10)) < 3)

@@ -485,7 +485,7 @@ _ppdCacheCreateWithFile(
   * Open the file...
   */
 
-  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+  if ((fp = cupsFileOpen(filename, "re")) == NULL)
   {
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     return (NULL);
@@ -2837,7 +2837,7 @@ _ppdCacheWriteFile(
   */
 
   snprintf(newfile, sizeof(newfile), "%s.N", filename);
-  if ((fp = cupsFileOpen(newfile, "w9")) == NULL)
+  if ((fp = cupsFileOpen(newfile, "w9e")) == NULL)
   {
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     return (0);
@@ -5128,7 +5128,7 @@ pwg_ppdize_name(const char *ipp,	/* I - IPP keyword */
     if (*ipp == '-' && _cups_isalnum(ipp[1]))
     {
       ipp ++;
-      *ptr++ = (char)toupper(*ipp++ & 255);
+      *ptr++ = (char)toupper(*ipp++);
     }
     else
       *ptr++ = *ipp++;
@@ -5213,7 +5213,7 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
   {
     if (_cups_isalnum(*ppd))
     {
-      *ptr++ = (char)tolower(*ppd & 255);
+      *ptr++ = (char)tolower(*ppd);
       nodash = 0;
     }
     else if (*ppd == '-' || strchr(dashchars, *ppd))
@@ -5238,7 +5238,7 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
 	*ptr++ = '-';
 	nodash = 1;
       }
-      else if (!isdigit(*ppd & 255) && isdigit(ppd[1] & 255))
+      else if (!isdigit(*ppd) && isdigit(ppd[1]))
       {
 	*ptr++ = '-';
 	nodash = 1;

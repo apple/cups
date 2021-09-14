@@ -57,7 +57,7 @@ main(int  argc,				/* I - Number of command-line args */
   else
   {
     copies = atoi(argv[4]);
-    fp     = fopen(argv[6], "rb");
+    fp     = fopen(argv[6], "rbe");
 
     if (!fp)
     {

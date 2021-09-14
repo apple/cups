@@ -107,13 +107,13 @@ main(int  argc,				/* I - Number of command-line args */
   * Read strings from the .po file and write to the .strings file...
   */
 
-  if ((po = cupsFileOpen(pofile, "r")) == NULL)
+  if ((po = cupsFileOpen(pofile, "re")) == NULL)
   {
     perror(pofile);
     return (1);
   }
 
-  if ((strings = cupsFileOpen(stringsfile, "w")) == NULL)
+  if ((strings = cupsFileOpen(stringsfile, "we")) == NULL)
   {
     perror(stringsfile);
     cupsFileClose(po);

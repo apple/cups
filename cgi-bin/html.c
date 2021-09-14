@@ -107,7 +107,7 @@ cgiFormEncode(char       *dst,		/* I - Destination string */
           if (dstptr < (dstend - 2))
 	  {
 	    *dstptr++ = '%';
-	    *dstptr++ = hex[(*src & 255) >> 4];
+	    *dstptr++ = hex[(*(unsigned char *)src) >> 4];
 	    *dstptr++ = hex[*src & 15];
 	    src ++;
 	  }

@@ -81,7 +81,7 @@ ppdcOption::~ppdcOption()
 //
 
 ppdcChoice *					// O - Choice or NULL
-ppdcOption::find_choice(const char *n)		// I - Name of choice
+ppdcOption::find_choice(const char *n) const		// I - Name of choice
 {
   ppdcChoice	*c;				// Current choice
 

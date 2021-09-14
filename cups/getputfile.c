@@ -15,7 +15,6 @@
 #include "cups-private.h"
 #include "debug-internal.h"
 #include <fcntl.h>
-#include <sys/stat.h>
 #if defined(_WIN32) || defined(__EMX__)
 #  include <io.h>
 #else
@@ -241,7 +240,7 @@ cupsGetFile(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DE
   * Create the file...
   */
 
-  if ((fd = open(filename, O_WRONLY | O_EXCL | O_TRUNC)) < 0)
+  if ((fd = open(filename, O_WRONLY | O_EXCL | O_TRUNC | O_CLOEXEC)) < 0)
   {
    /*
     * Couldn't open the file!
@@ -539,7 +538,7 @@ cupsPutFile(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DE
   * Open the local file...
   */
 
-  if ((fd = open(filename, O_RDONLY)) < 0)
+  if ((fd = open(filename, O_RDONLY | O_CLOEXEC)) < 0)
   {
    /*
     * Couldn't open the file!

@@ -270,7 +270,7 @@ cupsdStatBufUpdate(
   * Skip leading whitespace in the message...
   */
 
-  while (isspace(*message & 255))
+  while (isspace(*message))
     message ++;
 
  /*

@@ -335,7 +335,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       while (cupsFileGets(fp, line, sizeof(line)))
       {
-        for (lineptr = line; *lineptr && isspace(*lineptr & 255); lineptr ++);
+        for (lineptr = line; *lineptr && isspace(*lineptr); lineptr ++);
 
         if (inbody)
 	{

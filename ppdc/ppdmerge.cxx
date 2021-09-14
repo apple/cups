@@ -22,7 +22,7 @@
 //
 
 static const char	*ppd_locale(ppd_file_t *ppd);
-static void		usage(void) _CUPS_NORETURN;
+static void		usage() _CUPS_NORETURN;
 
 
 //
@@ -75,13 +75,12 @@ main(int  argc,				// I - Number of command-line arguments
 
 	  default :			// Unknown
 	      usage();
-	      break;
         }
     }
     else
     {
       // Open and load the PPD file...
-      if ((infile = cupsFileOpen(argv[i], "r")) == NULL)
+      if ((infile = cupsFileOpen(argv[i], "re")) == NULL)
       {
         _cupsLangPrintf(stderr, _("%s: Unable to open %s: %s"), "ppdmerge",
 	                argv[i], strerror(errno));
@@ -130,7 +129,7 @@ main(int  argc,				// I - Number of command-line arguments
 	return (1);
       }
 
-      if (!strcmp(locale, "en") && !inname && !outfile)
+      if (!strcmp(locale, "en"))
       {
         // Set the English PPD's filename...
 	inname    = argv[i];
@@ -194,15 +193,15 @@ main(int  argc,				// I - Number of command-line arguments
   }
 
   // Copy the English PPD starting with a cupsLanguages line...
-  infile = cupsFileOpen(inname, "r");
+  infile = cupsFileOpen(inname, "re");
 
   if (outname)
   {
     const char *ext = strrchr(outname, '.');
     if (ext && !strcmp(ext, ".gz"))
-      outfile = cupsFileOpen(outname, "w9");
+      outfile = cupsFileOpen(outname, "w9e");
     else
-      outfile = cupsFileOpen(outname, "w");
+      outfile = cupsFileOpen(outname, "we");
   }
   else
     outfile = cupsFileStdout();
@@ -349,7 +348,7 @@ ppd_locale(ppd_file_t *ppd)		// I - PPD file
 //
 
 static void
-usage(void)
+usage()
 {
   _cupsLangPuts(stdout, _("Usage: ppdmerge [options] filename.ppd [ ... "
                           "filenameN.ppd ]"));

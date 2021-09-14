@@ -234,9 +234,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     list = NULL;
   else
   {
-    for (list = dest; *list && !isspace(*list & 255); list ++);
+    for (list = dest; *list && !isspace(*list); list ++);
 
-    while (isspace(*list & 255))
+    while (isspace(*list))
       *list++ = '\0';
   }
 
@@ -291,8 +291,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	  agent = list;
 
-	  for (; *list && !isspace(*list & 255); list ++);
-	  while (isspace(*list & 255))
+	  for (; *list && !isspace(*list); list ++);
+	  while (isspace(*list))
 	    *list++ = '\0';
 
 	  syslog(LOG_INFO, "Remove jobs %s on %s by %s", list, dest, agent);
@@ -656,7 +656,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
       cups_serverroot = CUPS_SERVERROOT;
 
     snprintf(line, sizeof(line), "%s/lpoptions", cups_serverroot);
-    if ((fp = cupsFileOpen(line, "r")) != NULL)
+    if ((fp = cupsFileOpen(line, "re")) != NULL)
     {
       linenum = 0;
       while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
@@ -672,7 +672,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 	* Separate destination name from options...
 	*/
 
-	for (optptr = value; *optptr && !isspace(*optptr & 255); optptr ++);
+	for (optptr = value; *optptr && !isspace(*optptr); optptr ++);
 
 	while (*optptr == ' ')
 	  *optptr++ = '\0';
@@ -860,8 +860,8 @@ recv_print_job(
     command = line[0];
     count   = line + 1;
 
-    for (name = count + 1; *name && !isspace(*name & 255); name ++);
-    while (isspace(*name & 255))
+    for (name = count + 1; *name && !isspace(*name); name ++);
+    while (isspace(*name))
       *name++ = '\0';
 
     switch (command)
@@ -888,7 +888,7 @@ recv_print_job(
 	    * multiple control files per connection...
 	    */
 
-	    if ((fd = open(control, O_WRONLY)) < 0)
+	    if ((fd = open(control, O_WRONLY | O_CLOEXEC)) < 0)
 	    {
 	      syslog(LOG_ERR,
 	             "Unable to append to temporary control file \"%s\" - %s",
@@ -1019,7 +1019,7 @@ recv_print_job(
     * Process the control file and print stuff...
     */
 
-    if ((fp = fopen(control, "rb")) == NULL)
+    if ((fp = fopen(control, "rbe")) == NULL)
       status = 1;
     else
     {
@@ -1251,9 +1251,9 @@ remove_jobs(const char *dest,		/* I - Destination */
     * Skip job ID in list...
     */
 
-    while (isdigit(*list & 255))
+    while (isdigit(*list))
       list ++;
-    while (isspace(*list & 255))
+    while (isspace(*list))
       list ++;
 
    /*

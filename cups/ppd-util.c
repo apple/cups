@@ -387,7 +387,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   */
 
   if (buffer[0])
-    fd = open(buffer, O_CREAT | O_TRUNC | O_WRONLY, 0600);
+    fd = open(buffer, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, 0600);
   else
     fd = cupsTempFd(tempfile, sizeof(tempfile));
 
@@ -561,6 +561,8 @@ cups_get_printer_uri(
 		  "printer-uri-supported"
 		};
 
+
+  (void)depth;
 
   DEBUG_printf(("4cups_get_printer_uri(http=%p, name=\"%s\", host=%p, hostsize=%d, resource=%p, resourcesize=%d, depth=%d)", http, name, host, hostsize, resource, resourcesize, depth));
 

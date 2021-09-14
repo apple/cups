@@ -119,14 +119,8 @@ Setup(ppd_file_t *ppd)			/* I - PPD file */
 	break;
 
     case ZEBRA_EPL_LINE :
-	break;
-
     case ZEBRA_EPL_PAGE :
-	break;
-
     case ZEBRA_ZPL :
-        break;
-
     case ZEBRA_CPCL :
         break;
 
@@ -1129,7 +1123,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc == 7)
   {
-    if ((fd = open(argv[6], O_RDONLY)) == -1)
+    if ((fd = open(argv[6], O_RDONLY | O_CLOEXEC)) == -1)
     {
       _cupsLangPrintError("ERROR", _("Unable to open raster file"));
       sleep(1);

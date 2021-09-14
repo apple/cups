@@ -319,8 +319,8 @@ ppdLocalizeIPPReason(
 
         while (*valptr && !_cups_isspace(*valptr) && bufptr < bufend)
 	{
-	  if (*valptr == '%' && isxdigit(valptr[1] & 255) &&
-	      isxdigit(valptr[2] & 255))
+	  if (*valptr == '%' && isxdigit(valptr[1]) &&
+	      isxdigit(valptr[2]))
 	  {
 	   /*
 	    * Pull a hex-encoded character from the URI...
@@ -328,13 +328,13 @@ ppdLocalizeIPPReason(
 
             valptr ++;
 
-	    if (isdigit(*valptr & 255))
+	    if (isdigit(*valptr))
 	      ch = (*valptr - '0') << 4;
 	    else
 	      ch = (tolower(*valptr) - 'a' + 10) << 4;
 	    valptr ++;
 
-	    if (isdigit(*valptr & 255))
+	    if (isdigit(*valptr))
 	      *bufptr++ = (char)(ch | (*valptr - '0'));
 	    else
 	      *bufptr++ = (char)(ch | (tolower(*valptr) - 'a' + 10));
@@ -579,7 +579,7 @@ _ppdHashName(const char *name)		/* I - Name to hash */
 
 
   for (mult = 1; *name && mult <= 128; mult ++, name ++)
-    hash += (*name & 255) * mult;
+    hash += (*(unsigned char *)name) * mult;
 
   return (hash);
 }

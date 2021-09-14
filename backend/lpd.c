@@ -466,7 +466,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   else
   {
     filename = argv[6];
-    fd       = open(filename, O_RDONLY);
+    fd       = open(filename, O_RDONLY | O_CLOEXEC);
 
     if (fd == -1)
     {
@@ -491,7 +491,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     char *ptr;
 
     for (ptr = title; *ptr; ptr ++)
-      if (!isalnum(*ptr & 255) && !isspace(*ptr & 255))
+      if (!isalnum(*ptr) && !isspace(*ptr))
 	*ptr = '_';
   }
 

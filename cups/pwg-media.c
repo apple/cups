@@ -700,7 +700,7 @@ pwgMediaForPPD(const char *ppd)		/* I - PPD size name */
     */
 
     units = strchr(ptr, '.');
-    while (units && isdigit(units[1] & 255))
+    while (units && isdigit(units[1]))
       units = strchr(units + 1, '.');
 
     if (units)
@@ -710,7 +710,7 @@ pwgMediaForPPD(const char *ppd)		/* I - PPD size name */
 
     if (units > ptr)
     {
-      if (isdigit(*units & 255) || *units == '.')
+      if (isdigit(*units) || *units == '.')
         units ++;
 
       if (!_cups_strncasecmp(units, "cm", 2))

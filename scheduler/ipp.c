@@ -4168,8 +4168,8 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
     */
 
     attrname[2] = '_';
-    attrname[3] = (char)toupper(attrname[3] & 255);
-    attrname[4] = (char)toupper(attrname[4] & 255);
+    attrname[3] = (char)toupper(attrname[3]);
+    attrname[4] = (char)toupper(attrname[4]);
   }
 
   snprintf(filename, sizeof(filename), "%s/banners/%s/%s", DataDir,
@@ -4220,7 +4220,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
       */
 
       for (s = attrname; (ch = cupsFileGetChar(in)) != EOF;)
-        if (!isalpha(ch & 255) && ch != '-' && ch != '?')
+        if (!isalpha(ch) && ch != '-' && ch != '?')
           break;
 	else if (s < (attrname + sizeof(attrname) - 1))
           *s++ = (char)ch;
@@ -8378,7 +8378,7 @@ ppd_parse_line(const char *line,	/* I - Line */
   * Now grab the option choice, skipping leading whitespace...
   */
 
-  while (isspace(*line & 255))
+  while (isspace(*line))
     line ++;
 
   for (clen --;

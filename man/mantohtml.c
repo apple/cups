@@ -77,7 +77,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (argc > 1)
   {
-    if ((infile = fopen(argv[1], "r")) == NULL)
+    if ((infile = fopen(argv[1], "re")) == NULL)
     {
       perror(argv[1]);
       return (1);
@@ -88,7 +88,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (argc > 2)
   {
-    if ((outfile = fopen(argv[2], "w")) == NULL)
+    if ((outfile = fopen(argv[2], "we")) == NULL)
     {
       perror(argv[2]);
       fclose(infile);
@@ -183,7 +183,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  for (lineptr = line + 4; *lineptr; lineptr ++)
 	    if (*lineptr  == '\"')
 	      continue;
-	    else if (isalnum(*lineptr & 255))
+	    else if (isalnum(*lineptr))
 	      html_putc(*lineptr, outfile);
 	    else
 	      html_putc('_', outfile);
@@ -206,7 +206,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    if (first)
 	      html_putc(*lineptr, outfile);
 	    else
-	      html_putc(tolower(*lineptr & 255), outfile);
+	      html_putc(tolower(*lineptr), outfile);
 
             first = 0;
           }
@@ -632,7 +632,7 @@ main(int  argc,				/* I - Number of command-line args */
 	font = 0;
 
         lineptr = line + 4;
-        while (isspace(*lineptr & 255))
+        while (isspace(*lineptr))
           lineptr ++;
 
         if (!strncmp(lineptr, "\\(bu", 4) || !strncmp(lineptr, "\\(em", 4))
@@ -643,7 +643,7 @@ main(int  argc,				/* I - Number of command-line args */
 
           newlist = "ul";
 	}
-	else if (isdigit(*lineptr & 255))
+	else if (isdigit(*lineptr))
 	{
 	 /*
 	  * Numbered list...
@@ -651,7 +651,7 @@ main(int  argc,				/* I - Number of command-line args */
 
           newlist = "ol";
 	}
-	else if (islower(*lineptr & 255))
+	else if (islower(*lineptr))
 	{
 	 /*
 	  * Lowercase alpha list...
@@ -660,7 +660,7 @@ main(int  argc,				/* I - Number of command-line args */
           newlist = "ol";
           newtype = "a";
 	}
-	else if (isupper(*lineptr & 255))
+	else if (isupper(*lineptr))
 	{
 	 /*
 	  * Lowercase alpha list...
@@ -670,12 +670,12 @@ main(int  argc,				/* I - Number of command-line args */
           newtype = "A";
 	}
 
-        while (!isspace(*lineptr & 255))
+        while (!isspace(*lineptr))
           lineptr ++;
-        while (isspace(*lineptr & 255))
+        while (isspace(*lineptr))
           lineptr ++;
 
-        if (isdigit(*lineptr & 255))
+        if (isdigit(*lineptr))
           amount = (float)atof(lineptr);
 
         if (newlist && list && strcmp(newlist, list))
@@ -911,7 +911,7 @@ html_alternate(const char *s,		/* I - String */
   * Skip leading whitespace...
   */
 
-  while (isspace(*s & 255))
+  while (isspace(*s))
     s ++;
 
   dolinks = first && !strcmp(first, "b") && !second;
@@ -927,10 +927,10 @@ html_alternate(const char *s,		/* I - String */
       const char *end;			/* End of current word */
       const char *next;			/* Start of next word */
 
-      for (end = s; *end && !isspace(*end & 255); end ++);
-      for (next = end; isspace(*next & 255); next ++);
+      for (end = s; *end && !isspace(*end); end ++);
+      for (next = end; isspace(*next); next ++);
 
-      if (isalnum(*s & 255) && *next == '(')
+      if (isalnum(*s) && *next == '(')
       {
        /*
 	* See if the man file is available locally...
@@ -964,7 +964,7 @@ html_alternate(const char *s,		/* I - String */
     else if (i && second)
       fprintf(fp, "<%s>", second);
 
-    while ((!isspace(*s & 255) || quote) && *s)
+    while ((!isspace(*s) || quote) && *s)
     {
       if (*s == '\"')
         quote = !quote;
@@ -995,7 +995,7 @@ html_alternate(const char *s,		/* I - String */
     * Skip trailing whitespace...
     */
 
-    while (isspace(*s & 255))
+    while (isspace(*s))
       s ++;
   }
 
@@ -1167,7 +1167,7 @@ html_fputs(const char *s,		/* I  - String */
       char temp[1024];			/* Temporary string */
       const char *end = s + 6;		/* End of URL */
 
-      while (*end && !isspace(*end & 255))
+      while (*end && !isspace(*end))
 	end ++;
 
       if (end[-1] == ',' || end[-1] == '.' || end[-1] == ')')
@@ -1181,7 +1181,7 @@ html_fputs(const char *s,		/* I  - String */
       s = end;
     }
     else
-      html_putc(*s++ & 255, fp);
+      html_putc(*s++, fp);
   }
 }
 

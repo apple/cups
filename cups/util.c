@@ -833,7 +833,7 @@ cupsPrintFiles2(
     else
       docname = files[i];
 
-    if ((fp = cupsFileOpen(files[i], "rb")) == NULL)
+    if ((fp = cupsFileOpen(files[i], "rbe")) == NULL)
     {
      /*
       * Unable to open print file, cancel the job and return...

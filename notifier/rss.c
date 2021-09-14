@@ -46,7 +46,7 @@ static char		*rss_password;	/* Password for remote RSS */
  */
 
 static int		compare_rss(_cups_rss_t *a, _cups_rss_t *b);
-static void		delete_message(_cups_rss_t *rss);
+static void		delete_message(_cups_rss_t *msg);
 static void		load_rss(cups_array_t *rss, const char *filename);
 static _cups_rss_t	*new_message(int sequence_number, char *subject,
 			             char *text, char *link_url,
@@ -446,7 +446,7 @@ load_rss(cups_array_t *rss,		/* I - RSS messages */
   _cups_rss_t	*msg;			/* New message */
 
 
-  if ((fp = fopen(filename, "r")) == NULL)
+  if ((fp = fopen(filename, "re")) == NULL)
   {
     if (errno != ENOENT)
       fprintf(stderr, "ERROR: Unable to open %s: %s\n", filename,
@@ -606,7 +606,7 @@ save_rss(cups_array_t *rss,		/* I - RSS messages */
   char		*href;			/* Escaped base URL */
 
 
-  if ((fp = fopen(filename, "w")) == NULL)
+  if ((fp = fopen(filename, "we")) == NULL)
   {
     fprintf(stderr, "ERROR: Unable to create %s: %s\n", filename,
             strerror(errno));

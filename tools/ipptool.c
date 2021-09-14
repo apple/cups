@@ -301,7 +301,7 @@ main(int  argc,				/* I - Number of command-line args */
       if (data.outfile != cupsFileStdout())
 	usage();
 
-      if ((data.outfile = cupsFileOpen(argv[i], "w")) == NULL)
+      if ((data.outfile = cupsFileOpen(argv[i], "we")) == NULL)
       {
 	_cupsLangPrintf(stderr, _("%s: Unable to open \"%s\": %s"), "ipptool", argv[i], strerror(errno));
 	exit(1);
@@ -367,7 +367,7 @@ main(int  argc,				/* I - Number of command-line args */
               if (data.outfile != cupsFileStdout())
                 usage();
 
-              if ((data.outfile = cupsFileOpen(argv[i], "w")) == NULL)
+              if ((data.outfile = cupsFileOpen(argv[i], "we")) == NULL)
               {
                 _cupsLangPrintf(stderr, _("%s: Unable to open \"%s\": %s"), "ipptool", argv[i], strerror(errno));
                 exit(1);
@@ -492,7 +492,7 @@ main(int  argc,				/* I - Number of command-line args */
 		snprintf(filename, sizeof(filename), "%s.gz", argv[i]);
                 if (access(filename, 0) && filename[0] != '/'
 #ifdef _WIN32
-                    && (!isalpha(filename[0] & 255) || filename[1] != ':')
+                    && (!isalpha(filename[0]) || filename[1] != ':')
 #endif /* _WIN32 */
                     )
 		{
@@ -679,7 +679,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (access(argv[i], 0) && argv[i][0] != '/'
 #ifdef _WIN32
-          && (!isalpha(argv[i][0] & 255) || argv[i][1] != ':')
+          && (!isalpha(argv[i][0]) || argv[i][1] != ':')
 #endif /* _WIN32 */
           )
       {
@@ -1334,7 +1334,7 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 
       length = ippLength(request);
 
-      if (data->file[0] && (reqfile = cupsFileOpen(data->file, "r")) != NULL)
+      if (data->file[0] && (reqfile = cupsFileOpen(data->file, "re")) != NULL)
       {
        /*
 	* Read the file to get the uncompressed file size...
@@ -1370,7 +1370,7 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 
 	if (!Cancel && status == HTTP_STATUS_CONTINUE && ippGetState(request) == IPP_DATA && data->file[0])
 	{
-	  if ((reqfile = cupsFileOpen(data->file, "r")) != NULL)
+	  if ((reqfile = cupsFileOpen(data->file, "re")) != NULL)
 	  {
 	    while (!Cancel && (bytes = cupsFileRead(reqfile, buffer, sizeof(buffer))) > 0)
 	    {
@@ -2473,7 +2473,7 @@ get_filename(const char *testfile,	/* I - Current test file */
   }
   else if (!access(src, R_OK) || *src == '/'
 #ifdef _WIN32
-           || (isalpha(*src & 255) && src[1] == ':')
+           || (isalpha(*src) && src[1] == ':')
 #endif /* _WIN32 */
            )
   {
@@ -3115,7 +3115,7 @@ pause_message(const char *message)	/* I - Message */
   * Disable input echo and set raw input...
   */
 
-  if ((tty = open("/dev/tty", O_RDONLY)) < 0)
+  if ((tty = open("/dev/tty", O_RDONLY | O_CLOEXEC)) < 0)
     return;
 
   if (tcgetattr(tty, &original))
@@ -3807,7 +3807,7 @@ print_xml_string(cups_file_t *outfile,	/* I - Test data */
         cupsFilePutChar(outfile, *s);
       }
     }
-    else if ((*s & 0x80) || (*s < ' ' && !isspace(*s & 255)))
+    else if ((*s & 0x80) || (*s < ' ' && !isspace(*s)))
     {
      /*
       * Invalid control character...
@@ -4086,7 +4086,7 @@ token_cb(_ipp_file_t    *f,		/* I - IPP file data */
 
       if (_ippFileReadToken(f, temp, sizeof(temp)))
       {
-	if (isdigit(temp[0] & 255))
+	if (isdigit(temp[0]))
 	{
 	  data->request_id = atoi(temp) - 1;
 	}
@@ -5551,12 +5551,12 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 
           valptr = value;
 
-	  while (isspace(*valptr & 255) || isdigit(*valptr & 255) ||
+	  while (isspace(*valptr) || isdigit(*valptr) ||
 		 *valptr == '-' || *valptr == ',' || *valptr == '<' ||
 		 *valptr == '=' || *valptr == '>')
 	  {
 	    op = '=';
-	    while (*valptr && !isdigit(*valptr & 255) && *valptr != '-')
+	    while (*valptr && !isdigit(*valptr) && *valptr != '-')
 	    {
 	      if (*valptr == '<' || *valptr == '>' || *valptr == '=')
 		op = *valptr;
@@ -5618,12 +5618,12 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 	  lower = ippGetRange(attr, i, &upper);
           valptr = value;
 
-	  while (isspace(*valptr & 255) || isdigit(*valptr & 255) ||
+	  while (isspace(*valptr) || isdigit(*valptr) ||
 		 *valptr == '-' || *valptr == ',' || *valptr == '<' ||
 		 *valptr == '=' || *valptr == '>')
 	  {
 	    op = '=';
-	    while (*valptr && !isdigit(*valptr & 255) && *valptr != '-')
+	    while (*valptr && !isdigit(*valptr) && *valptr != '-')
 	    {
 	      if (*valptr == '<' || *valptr == '>' || *valptr == '=')
 		op = *valptr;
@@ -6000,7 +6000,7 @@ with_value(ipptool_test_t *data,	/* I - Test data */
 
             for (valptr = value + 1, adata = withdata; *valptr; valptr += 2)
             {
-              int ch;			/* Current character/byte */
+              char ch;			/* Current character/byte */
 
 	      if (isdigit(valptr[0]))
 	        ch = (valptr[0] - '0') << 4;

@@ -287,9 +287,9 @@ _cups_debug_set(const char *logfile,	/* I - Log file or NULL */
       snprintf(buffer, sizeof(buffer), logfile, getpid());
 
       if (buffer[0] == '+')
-	_cups_debug_fd = open(buffer + 1, O_WRONLY | O_APPEND | O_CREAT, 0644);
+	_cups_debug_fd = open(buffer + 1, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
       else
-	_cups_debug_fd = open(buffer, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+	_cups_debug_fd = open(buffer, O_WRONLY | O_TRUNC | O_CREAT | O_CLOEXEC, 0644);
     }
 
     if (level)
@@ -405,7 +405,7 @@ _cups_safe_vsnprintf(
       {
 	width = 0;
 
-	while (isdigit(*format & 255))
+	while (isdigit(*format))
 	{
 	  if (tptr < (tformat + sizeof(tformat) - 1))
 	    *tptr++ = *format;
@@ -437,7 +437,7 @@ _cups_safe_vsnprintf(
 	{
 	  prec = 0;
 
-	  while (isdigit(*format & 255))
+	  while (isdigit(*format))
 	  {
 	    if (tptr < (tformat + sizeof(tformat) - 1))
 	      *tptr++ = *format;
@@ -609,7 +609,7 @@ _cups_safe_vsnprintf(
 		*bufptr++ = '\"';
 		bytes += 2;
 	      }
-	      else if ((*s & 255) < ' ')
+	      else if ((*(unsigned char*)s) < ' ')
 	      {
 	        if ((bufptr + 2) >= bufend)
 	          break;

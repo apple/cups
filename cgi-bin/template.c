@@ -113,15 +113,15 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
   directory = cgiGetTemplateDir();
 
   snprintf(filename, sizeof(filename), "%s%s/%s", directory, locale, tmpl);
-  if ((in = fopen(filename, "r")) == NULL)
+  if ((in = fopen(filename, "re")) == NULL)
   {
     locale[3] = '\0';
 
     snprintf(filename, sizeof(filename), "%s%s/%s", directory, locale, tmpl);
-    if ((in = fopen(filename, "r")) == NULL)
+    if ((in = fopen(filename, "re")) == NULL)
     {
       snprintf(filename, sizeof(filename), "%s/%s", directory, tmpl);
-      in = fopen(filename, "r");
+      in = fopen(filename, "re");
     }
   }
 
@@ -254,7 +254,7 @@ cgi_copy(FILE *out,			/* I - Output file */
 
       *s = '\0';
 
-      if (s == name && isspace(ch & 255))
+      if (s == name && isspace(ch))
       {
         fprintf(stderr, "DEBUG2: %*sLone { at %ld...\n", indent, "", ftell(in));
 
@@ -281,7 +281,7 @@ cgi_copy(FILE *out,			/* I - Output file */
         * Insert value only if it exists...
 	*/
 
-	if ((nameptr = strrchr(name, '-')) != NULL && isdigit(nameptr[1] & 255))
+	if ((nameptr = strrchr(name, '-')) != NULL && isdigit(nameptr[1]))
 	{
 	  *nameptr++ = '\0';
 
@@ -325,7 +325,7 @@ cgi_copy(FILE *out,			/* I - Output file */
 	int  count;	/* Number of elements */
 
 
-        if (isdigit(name[1] & 255))
+        if (isdigit(name[1]))
 	  count = atoi(name + 1);
 	else
           count = cgiGetSize(name + 1);
@@ -373,7 +373,7 @@ cgi_copy(FILE *out,			/* I - Output file */
         * Insert variable or variable name (if element is NULL)...
 	*/
 
-	if ((nameptr = strrchr(name, '-')) != NULL && isdigit(nameptr[1] & 255))
+	if ((nameptr = strrchr(name, '-')) != NULL && isdigit(nameptr[1]))
 	{
 	  *nameptr++ = '\0';
 	  if ((value = cgiGetArray(name, atoi(nameptr) - 1)) == NULL)
@@ -476,7 +476,7 @@ cgi_copy(FILE *out,			/* I - Output file */
             if (innername[0] == '#')
 	      snprintf(s, sizeof(compare) - (size_t)(s - compare), "%d", cgiGetSize(innername + 1));
 	    else if ((innerptr = strrchr(innername, '-')) != NULL &&
-	             isdigit(innerptr[1] & 255))
+	             isdigit(innerptr[1]))
             {
 	      *innerptr++ = '\0';
 	      if ((innerval = cgiGetArray(innername, atoi(innerptr) - 1)) == NULL)
@@ -549,10 +549,10 @@ cgi_copy(FILE *out,			/* I - Output file */
 
 	        if (!regexec(&re, outptr, 10, matches, 0))
 		{
-		  int i;
+		  unsigned i;
 		  for (i = 0; i < 10; i ++)
 		  {
-		    fprintf(stderr, "DEBUG: matches[%d].rm_so=%d\n", i,
+		    fprintf(stderr, "DEBUG: matches[%u].rm_so=%d\n", i,
 		            (int)matches[i].rm_so);
 		    if (matches[i].rm_so < 0)
 		      break;
@@ -671,7 +671,7 @@ cgi_puturi(const char *s,		/* I - String to output */
   while (*s)
   {
     if (strchr("%@&+ <>#=", *s) || *s < ' ' || *s & 128)
-      fprintf(out, "%%%02X", *s & 255);
+      fprintf(out, "%%%02X", *(unsigned char *)s);
     else
       putc(*s, out);
 

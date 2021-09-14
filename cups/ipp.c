@@ -4721,7 +4721,7 @@ ippValidateAttribute(
   */
 
   for (ptr = attr->name; *ptr; ptr ++)
-    if (!isalnum(*ptr & 255) && *ptr != '-' && *ptr != '.' && *ptr != '_')
+    if (!isalnum(*ptr) && *ptr != '-' && *ptr != '.' && *ptr != '_')
       break;
 
   if (*ptr || ptr == attr->name)
@@ -4998,7 +4998,7 @@ ippValidateAttribute(
 	{
 	  for (ptr = attr->values[i].string.text; *ptr; ptr ++)
 	  {
-	    if (!isalnum(*ptr & 255) && *ptr != '-' && *ptr != '.' &&
+	    if (!isalnum(*ptr) && *ptr != '-' && *ptr != '.' &&
 	        *ptr != '_')
 	      break;
 	  }
@@ -5039,11 +5039,11 @@ ippValidateAttribute(
         for (i = 0; i < attr->num_values; i ++)
 	{
 	  ptr = attr->values[i].string.text;
-	  if (islower(*ptr & 255))
+	  if (islower(*ptr))
 	  {
 	    for (ptr ++; *ptr; ptr ++)
 	    {
-	      if (!islower(*ptr & 255) && !isdigit(*ptr & 255) &&
+	      if (!islower(*ptr) && !isdigit(*ptr) &&
 	          *ptr != '+' && *ptr != '-' && *ptr != '.')
                 break;
 	    }
@@ -5068,8 +5068,8 @@ ippValidateAttribute(
 	{
 	  for (ptr = attr->values[i].string.text; *ptr; ptr ++)
 	  {
-	    if (!isprint(*ptr & 255) || isupper(*ptr & 255) ||
-	        isspace(*ptr & 255))
+	    if (!isprint(*ptr) || isupper(*ptr) ||
+	        isspace(*ptr))
 	      break;
 	  }
 

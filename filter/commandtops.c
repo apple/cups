@@ -75,7 +75,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc == 7)
   {
-    if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
+    if ((fp = cupsFileOpen(argv[6], "re")) == NULL)
     {
       perror("ERROR: Unable to open command file - ");
       return (1);
@@ -312,12 +312,12 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
       bytes = bufptr - buffer;
 
       for (bufptr --; bufptr >= buffer; bufptr --)
-        if (isspace(*bufptr & 255) || iscntrl(*bufptr & 255))
+        if (isspace(*bufptr) || iscntrl(*bufptr))
 	  *bufptr = '\0';
 	else
 	  break;
 
-      for (bufptr = buffer; isspace(*bufptr & 255) || iscntrl(*bufptr & 255);
+      for (bufptr = buffer; isspace(*bufptr) || iscntrl(*bufptr);
 	   bufptr ++);
 
       if (bufptr > buffer)

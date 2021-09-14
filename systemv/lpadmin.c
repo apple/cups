@@ -1390,11 +1390,11 @@ set_printer_options(
         strlcpy(keyword, line + 8, sizeof(keyword));
 
 	for (keyptr = keyword; *keyptr; keyptr ++)
-	  if (*keyptr == ':' || isspace(*keyptr & 255))
+	  if (*keyptr == ':' || isspace(*keyptr))
 	    break;
 
         *keyptr++ = '\0';
-        while (isspace(*keyptr & 255))
+        while (isspace(*keyptr))
 	  keyptr ++;
 
         if (!strcmp(keyword, "PageRegion") ||

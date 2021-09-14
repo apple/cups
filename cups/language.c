@@ -198,8 +198,8 @@ _cupsAppleLanguage(const char *locale,	/* I - Locale ID */
 	  */
 
 	  language[2] = '_';
-	  language[3] = (char)toupper(language[3] & 255);
-	  language[4] = (char)toupper(language[4] & 255);
+	  language[3] = (char)toupper(language[3]);
+	  language[4] = (char)toupper(language[4]);
 	}
 	break;
   }
@@ -669,7 +669,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       if (*language == '_' || *language == '-' || *language == '.')
 	break;
       else if (ptr < (langname + sizeof(langname) - 1))
-        *ptr++ = (char)tolower(*language & 255);
+        *ptr++ = (char)tolower(*language);
 
     *ptr = '\0';
 
@@ -683,7 +683,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 	if (*language == '.')
 	  break;
 	else if (ptr < (country + sizeof(country) - 1))
-          *ptr++ = (char)toupper(*language & 255);
+          *ptr++ = (char)toupper(*language);
 
       *ptr = '\0';
 
@@ -705,7 +705,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
       for (language ++, ptr = charset; *language; language ++)
         if (_cups_isalnum(*language) && ptr < (charset + sizeof(charset) - 1))
-          *ptr++ = (char)toupper(*language & 255);
+          *ptr++ = (char)toupper(*language);
 
       *ptr = '\0';
     }
@@ -939,7 +939,7 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
   * Open the message catalog file...
   */
 
-  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+  if ((fp = cupsFileOpen(filename, "re")) == NULL)
   {
     DEBUG_printf(("5_cupsMessageLoad: Unable to open file: %s",
                   strerror(errno)));
@@ -1244,7 +1244,7 @@ _cupsMessageSave(const char   *filename,/* I - Output filename */
   * Output message catalog file...
   */
 
-  if ((fp = cupsFileOpen(filename, "w")) == NULL)
+  if ((fp = cupsFileOpen(filename, "we")) == NULL)
     return (-1);
 
  /*
@@ -1784,7 +1784,7 @@ cups_read_strings(cups_file_t  *fp,	/* I - .strings file */
     *   "message" = "translation";
     */
 
-    for (bufptr = buffer; *bufptr && isspace(*bufptr & 255); bufptr ++);
+    for (bufptr = buffer; *bufptr && isspace(*bufptr); bufptr ++);
 
     if (*bufptr != '\"')
       continue;
@@ -1810,14 +1810,14 @@ cups_read_strings(cups_file_t  *fp,	/* I - .strings file */
     * Find the start of the translation...
     */
 
-    while (*bufptr && isspace(*bufptr & 255))
+    while (*bufptr && isspace(*bufptr))
       bufptr ++;
 
     if (*bufptr != '=')
       continue;
 
     bufptr ++;
-    while (*bufptr && isspace(*bufptr & 255))
+    while (*bufptr && isspace(*bufptr))
       bufptr ++;
 
     if (*bufptr != '\"')

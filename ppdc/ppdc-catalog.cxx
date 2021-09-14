@@ -166,7 +166,7 @@ ppdcCatalog::~ppdcCatalog()
 void
 ppdcCatalog::add_message(
     const char *id,			// I - Message ID to add
-    const char *string)			// I - Translation string
+    const char *string) const			// I - Translation string
 {
   ppdcMessage	*m;			// Current message
   char		text[1024];		// Text to translate
@@ -207,7 +207,7 @@ ppdcCatalog::add_message(
 
 const char *				// O - Message text
 ppdcCatalog::find_message(
-    const char *id)			// I - Message ID
+    const char *id) const			// I - Message ID
 {
   ppdcMessage	*m;			// Current message
 
@@ -242,7 +242,7 @@ ppdcCatalog::load_messages(
 
 
   // Open the message catalog file...
-  if ((fp = cupsFileOpen(f, "r")) == NULL)
+  if ((fp = cupsFileOpen(f, "re")) == NULL)
     return (-1);
 
   if ((ptr = (char *)strrchr(f, '.')) == NULL)
@@ -516,7 +516,7 @@ ppdcCatalog::load_messages(
 
 int					// O - 0 on success, -1 on error
 ppdcCatalog::save_messages(
-    const char *f)			// I - File to save to
+    const char *f) const			// I - File to save to
 {
   cups_file_t	*fp;			// Message file
   ppdcMessage	*m;			// Current message
@@ -530,9 +530,9 @@ ppdcCatalog::save_messages(
     return (-1);
 
   if (!strcmp(ptr, ".gz"))
-    fp = cupsFileOpen(f, "w9");
+    fp = cupsFileOpen(f, "w9e");
   else
-    fp = cupsFileOpen(f, "w");
+    fp = cupsFileOpen(f, "we");
 
   if (!fp)
     return (-1);

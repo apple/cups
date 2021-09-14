@@ -100,7 +100,7 @@ _ippVarsExpand(_ipp_vars_t *v,		/* I - IPP variables */
 	  strlcpy(temp, src + 1, sizeof(temp));
 
 	  for (tempptr = temp; *tempptr; tempptr ++)
-	    if (!isalnum(*tempptr & 255) && *tempptr != '-' && *tempptr != '_')
+	    if (!isalnum(*tempptr) && *tempptr != '-' && *tempptr != '_')
 	      break;
 
 	  if (*tempptr)

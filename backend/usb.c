@@ -219,7 +219,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Try to open the print file...
     */
 
-    if ((print_fd = open(argv[6], O_RDONLY)) < 0)
+    if ((print_fd = open(argv[6], O_RDONLY | O_CLOEXEC)) < 0)
     {
       _cupsLangPrintError("ERROR", _("Unable to open print file"));
       return (CUPS_BACKEND_FAILED);

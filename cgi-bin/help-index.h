@@ -33,7 +33,7 @@ typedef struct help_word_s		/**** Help word structure... ****/
 {
   int		count;			/* Number of occurrences */
   char		*text;			/* Word text */
-} help_word_t;
+} __attribute__((aligned(16))) help_word_t;
 
 typedef struct help_node_s		/**** Help node structure... ****/
 {
@@ -46,14 +46,14 @@ typedef struct help_node_s		/**** Help node structure... ****/
   off_t		offset;			/* Offset in file */
   size_t	length;			/* Length in bytes */
   int		score;			/* Search score */
-} help_node_t;
+} __attribute__((packed)) __attribute__((aligned(64))) help_node_t;
 
 typedef struct help_index_s		/**** Help index structure ****/
 {
   int		search;			/* 1 = search index, 0 = normal */
   cups_array_t	*nodes;			/* Nodes sorted by filename */
   cups_array_t	*sorted;		/* Nodes sorted by score + text */
-} help_index_t;
+} __attribute__((packed)) __attribute__((aligned(32))) help_index_t;
 
 
 /*

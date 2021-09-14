@@ -133,7 +133,7 @@ _cupsArrayAddStrings(cups_array_t *a,	/* I - Array */
 
     DEBUG_puts("1_cupsArrayAddStrings: Skipping leading whitespace.");
 
-    while (*s && isspace(*s & 255))
+    while (*s && isspace(*s))
       s ++;
 
     DEBUG_printf(("1_cupsArrayAddStrings: Remaining string \"%s\".", s));
@@ -168,9 +168,9 @@ _cupsArrayAddStrings(cups_array_t *a,	/* I - Array */
 
       if (delim == ' ')
       {
-        while (*end && !isspace(*end & 255))
+        while (*end && !isspace(*end))
           end ++;
-        while (*end && isspace(*end & 255))
+        while (*end && isspace(*end))
           *end++ = '\0';
       }
       else if ((end = strchr(start, delim)) != NULL)

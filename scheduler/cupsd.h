@@ -8,6 +8,8 @@
  * information.
  */
 
+#ifndef _CUPSD_H
+#define _CUPSD_H
 
 /*
  * Include necessary headers.
@@ -220,3 +222,5 @@ extern void		cupsdStopSelect(void);
 /* server.c */
 extern void		cupsdStartServer(void);
 extern void		cupsdStopServer(void);
+
+#endif

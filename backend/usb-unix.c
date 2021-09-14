@@ -216,21 +216,21 @@ list_devices(void)
 
     snprintf(device, sizeof(device), "/dev/usblp%d", i);
 
-    if ((fd = open(device, O_RDWR | O_EXCL)) < 0)
+    if ((fd = open(device, O_RDWR | O_EXCL | O_CLOEXEC)) < 0)
     {
       if (errno != ENOENT)
 	continue;
 
       snprintf(device, sizeof(device), "/dev/usb/lp%d", i);
 
-      if ((fd = open(device, O_RDWR | O_EXCL)) < 0)
+      if ((fd = open(device, O_RDWR | O_EXCL | O_CLOEXEC)) < 0)
       {
 	if (errno != ENOENT)
 	  continue;
 
 	snprintf(device, sizeof(device), "/dev/usb/usblp%d", i);
 
-    	if ((fd = open(device, O_RDWR | O_EXCL)) < 0)
+    	if ((fd = open(device, O_RDWR | O_EXCL | O_CLOEXEC)) < 0)
 	  continue;
       }
     }
@@ -260,7 +260,7 @@ list_devices(void)
   {
     snprintf(device, sizeof(device), "/dev/usb/printer%d", i);
 
-    if ((fd = open(device, O_WRONLY | O_EXCL)) >= 0)
+    if ((fd = open(device, O_WRONLY | O_EXCL | O_CLOEXEC)) >= 0)
     {
       if (!backendGetDeviceID(fd, device_id, sizeof(device_id),
                               make_model, sizeof(make_model),
@@ -346,15 +346,15 @@ open_device(const char *uri,		/* I - Device URI */
 
 	snprintf(device, sizeof(device), "/dev/usblp%d", i);
 
-	if ((fd = open(device, O_RDWR | O_EXCL)) < 0 && errno == ENOENT)
+	if ((fd = open(device, O_RDWR | O_EXCL | O_CLOEXEC)) < 0 && errno == ENOENT)
 	{
 	  snprintf(device, sizeof(device), "/dev/usb/lp%d", i);
 
-	  if ((fd = open(device, O_RDWR | O_EXCL)) < 0 && errno == ENOENT)
+	  if ((fd = open(device, O_RDWR | O_EXCL | O_CLOEXEC)) < 0 && errno == ENOENT)
 	  {
 	    snprintf(device, sizeof(device), "/dev/usb/usblp%d", i);
 
-    	    if ((fd = open(device, O_RDWR | O_EXCL)) < 0 && errno == ENOENT)
+    	    if ((fd = open(device, O_RDWR | O_EXCL | O_CLOEXEC)) < 0 && errno == ENOENT)
 	      continue;
 	  }
 	}
@@ -442,7 +442,7 @@ open_device(const char *uri,		/* I - Device URI */
       {
 	snprintf(device, sizeof(device), "/dev/usb/printer%d", i);
 
-	if ((fd = open(device, O_WRONLY | O_EXCL)) >= 0)
+	if ((fd = open(device, O_WRONLY | O_EXCL | O_CLOEXEC)) >= 0)
 	  backendGetDeviceID(fd, device_id, sizeof(device_id),
                              make_model, sizeof(make_model),
 			     "usb", device_uri, sizeof(device_uri));
@@ -504,13 +504,13 @@ open_device(const char *uri,		/* I - Device URI */
 #else
   {
     if (*use_bc)
-      fd = open(uri + 4, O_RDWR | O_EXCL);
+      fd = open(uri + 4, O_RDWR | O_EXCL | O_CLOEXEC);
     else
       fd = -1;
 
     if (fd < 0)
     {
-      fd      = open(uri + 4, O_WRONLY | O_EXCL);
+      fd      = open(uri + 4, O_WRONLY | O_EXCL | O_CLOEXEC);
       *use_bc = 0;
     }
 

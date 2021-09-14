@@ -7,6 +7,8 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _POLICY_H
+#define _POLICY_H
 
 /*
  * Policy structure...
@@ -50,3 +52,5 @@ extern cups_array_t	*cupsdGetPrivateAttrs(cupsd_policy_t *p,
 			                      cupsd_client_t *con,
 					      cupsd_printer_t *printer,
 			                      const char *owner);
+
+#endif

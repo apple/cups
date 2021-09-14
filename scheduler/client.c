@@ -1382,7 +1382,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    */
 
             cupsdSetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
-	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
+	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0640);
 
 	    if (con->file < 0)
 	    {
@@ -1660,7 +1660,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
             cupsdSetStringf(&con->filename, "%s/%08x", RequestRoot,
 	                    request_id ++);
-	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
+	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0640);
 
 	    if (con->file < 0)
 	    {
@@ -1860,7 +1860,7 @@ cupsdSendCommand(
 
   if (con->filename)
   {
-    fd = open(con->filename, O_RDONLY);
+    fd = open(con->filename, O_RDONLY | O_CLOEXEC);
 
     if (fd < 0)
     {
@@ -2391,7 +2391,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	    if (value)
 	    {
 	      *value++ = '\0';
-	      while (isspace(*value & 255))
+	      while (isspace(*value))
 		value ++;
 	    }
 
@@ -3005,7 +3005,7 @@ install_cupsd_conf(cupsd_client_t *con)	/* I - Connection */
   * Open the request file...
   */
 
-  if ((in = cupsFileOpen(con->filename, "rb")) == NULL)
+  if ((in = cupsFileOpen(con->filename, "rbe")) == NULL)
   {
     cupsdLogClient(con, CUPSD_LOG_ERROR, "Unable to open request file \"%s\": %s",
                     con->filename, strerror(errno));
@@ -3309,8 +3309,8 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 	else
 	  break;
       }
-      else if (*commptr == '%' && isxdigit(commptr[1] & 255) &&
-               isxdigit(commptr[2] & 255))
+      else if (*commptr == '%' && isxdigit(commptr[1]) &&
+               isxdigit(commptr[2]))
       {
        /*
 	* Convert the %xx notation to the individual character.
@@ -3613,7 +3613,7 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
   * Check if the hostname is an IP address...
   */
 
-  if (isdigit(con->clientname[0] & 255) || con->clientname[0] == '[')
+  if (isdigit(con->clientname[0]) || con->clientname[0] == '[')
   {
    /*
     * Possible IPv4/IPv6 address...
@@ -3723,7 +3723,7 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 	   char           *type,	/* I - File type */
 	   struct stat    *filestats)	/* O - File information */
 {
-  con->file = open(filename, O_RDONLY);
+  con->file = open(filename, O_RDONLY | O_CLOEXEC);
 
   cupsdLogClient(con, CUPSD_LOG_DEBUG2, "write_file: code=%d, filename=\"%s\" (%d), type=\"%s\", filestats=%p.", code, filename, con->file, type ? type : "(null)", filestats);
 

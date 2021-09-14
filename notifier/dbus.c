@@ -625,7 +625,7 @@ acquire_lock(int    *fd,		/* O - Lock file descriptor */
   * Create the lock file and fail if it already exists...
   */
 
-  if ((*fd = open(lockfile, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR)) < 0)
+  if ((*fd = open(lockfile, O_RDWR | O_CREAT | O_EXCL | O_CLOEXEC, S_IRUSR | S_IWUSR)) < 0)
     return (-1);
 
  /*

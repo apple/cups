@@ -35,7 +35,7 @@ static void	write_cstring(const char *s);
 //
 
 int					// O - Exit status
-main(void)
+main()
 {
   ppdcSource	*src;			// PPD source file data
   ppdcCatalog	*catalog;		// Catalog to hold all of the UI strings

@@ -37,7 +37,7 @@ typedef struct pwg_map_s		/**** Map element - PPD to/from PWG @exclude all@ */
 {
   char		*pwg,			/* PWG media keyword */
 		*ppd;			/* PPD option keyword */
-} pwg_map_t;
+} __attribute__((aligned(16))) pwg_map_t;
 
 typedef struct pwg_media_s		/**** Common media size data ****/
 {
@@ -46,7 +46,7 @@ typedef struct pwg_media_s		/**** Common media size data ****/
 		*ppd;			/* Standard Adobe PPD name */
   int		width,			/* Width in 2540ths */
 		length;			/* Length in 2540ths */
-} pwg_media_t;
+} __attribute__((aligned(32))) pwg_media_t;
 
 typedef struct pwg_size_s		/**** Size element - PPD to/from PWG @exclude all@ */
 {
@@ -57,7 +57,7 @@ typedef struct pwg_size_s		/**** Size element - PPD to/from PWG @exclude all@ */
 		bottom,			/* Bottom margin in 2540ths */
 		right,			/* Right margin in 2540ths */
 		top;			/* Top margin in 2540ths */
-} pwg_size_t;
+} __attribute__((aligned(64))) pwg_size_t;
 
 
 /*

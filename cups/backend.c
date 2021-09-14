@@ -40,7 +40,7 @@ cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
   const char	*device_uri,		/* Device URI */
 		*auth_info_required;	/* AUTH_INFO_REQUIRED env var */
   _cups_globals_t *cg = _cupsGlobals();	/* Global info */
-  int		options;		/* Resolve options */
+  unsigned		options;		/* Resolve options */
   ppd_file_t	*ppd;			/* PPD file */
   ppd_attr_t	*ppdattr;		/* PPD attribute */
 
@@ -123,7 +123,7 @@ quote_string(const char *s)		/* I - String to write */
       if (*s == '\\' || *s == '\"')
 	putchar('\\');
 
-      if (((*s & 255) < ' ' && *s != '\t') || *s == 0x7f)
+      if (((*(unsigned char *)s) < ' ' && *s != '\t') || *s == 0x7f)
         putchar(' ');
       else
         putchar(*s);

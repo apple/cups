@@ -111,25 +111,25 @@ cupsCharsetToUTF8(
 
   destptr = dest;
 
-  if (encoding == CUPS_ISO8859_1)
+if (encoding == CUPS_ISO8859_1)
   {
-    int		ch;			/* Character from string */
-    cups_utf8_t	*destend;		/* End of UTF-8 buffer */
+    cups_utf8_t ch;       /* Character from string */
+    cups_utf8_t *destend; /* End of UTF-8 buffer */
 
 
     destend = dest + maxout - 2;
 
     while (*src && destptr < destend)
     {
-      ch = *src++ & 255;
+      ch = *(cups_utf8_t *)src++;
 
       if (ch & 128)
       {
-	*destptr++ = (cups_utf8_t)(0xc0 | (ch >> 6));
-	*destptr++ = (cups_utf8_t)(0x80 | (ch & 0x3f));
+        *destptr++ = (0xc0 | (ch >> 6));
+        *destptr++ = (0x80 | (ch & 0x3f));
       }
       else
-	*destptr++ = (cups_utf8_t)ch;
+        *destptr++ = ch;
     }
 
     *destptr = '\0';

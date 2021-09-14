@@ -82,7 +82,7 @@ cgiCompileSearch(const char *query)	/* I - Query string */
     * Skip leading whitespace...
     */
 
-    while (isspace(*qptr & 255))
+    while (isspace(*qptr))
       qptr ++;
 
     if (!*qptr)

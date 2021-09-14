@@ -254,7 +254,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Try to open the print file...
     */
 
-    if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
+    if ((fp = cupsFileOpen(argv[6], "re")) == NULL)
     {
       if (!JobCanceled)
       {
@@ -484,7 +484,7 @@ check_range(pstops_doc_t *doc,		/* I - Document information */
       if (*range == '-')
       {
         range ++;
-	if (!isdigit(*range & 255))
+	if (!isdigit(*range))
 	  upper = 65535;
 	else
 	  upper = (int)strtol(range, (char **)&range, 10);
@@ -585,7 +585,7 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     {
       linelen --;
 
-      if (!isspace(line[linelen] & 255))
+      if (!isspace(line[linelen]))
         break;
       else
         line[linelen] = '\0';
@@ -913,7 +913,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 
     cupsFileClose(doc->temp);
 
-    doc->temp = cupsFileOpen(doc->tempfile, "r");
+    doc->temp = cupsFileOpen(doc->tempfile, "re");
 
    /*
     * Make the copies...
@@ -1170,7 +1170,7 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
 
     cupsFileClose(doc->temp);
 
-    doc->temp = cupsFileOpen(doc->tempfile, "r");
+    doc->temp = cupsFileOpen(doc->tempfile, "re");
 
    /*
     * Make the additional copies as needed...
@@ -1248,7 +1248,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
     label[0] = '\0';
     number   = doc->page;
   }
-  else if (strtol(ptr, &ptr, 10) == LONG_MAX || !isspace(*ptr & 255))
+  else if (strtol(ptr, &ptr, 10) == LONG_MAX || !isspace(*ptr))
   {
     fputs("DEBUG: There was a bad %%Page: comment in the file.\n", stderr);
     number = doc->page;
@@ -2218,7 +2218,7 @@ parse_text(const char *start,		/* I - Start of text value */
   * Skip leading whitespace...
   */
 
-  while (isspace(*start & 255))
+  while (isspace(*start))
     start ++;
 
  /*
@@ -2231,7 +2231,7 @@ parse_text(const char *start,		/* I - Start of text value */
 
   while (*start && bufptr < bufend)
   {
-    if (isspace(*start & 255) && !level)
+    if (isspace(*start) && !level)
       break;
 
     *bufptr++ = *start;
@@ -2258,7 +2258,7 @@ parse_text(const char *start,		/* I - Start of text value */
 
 
       for (i = 1;
-           i <= 3 && isdigit(start[i] & 255) && bufptr < bufend;
+           i <= 3 && isdigit(start[i]) && bufptr < bufend;
 	   *bufptr++ = start[i], i ++);
     }
 
@@ -3112,19 +3112,22 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
     * Draw border boxes...
     */
 
-    for (; rects > 0; rects --, margin += 2 * fscale)
-      if (doc->number_up > 1)
-	doc_printf(doc, "%.1f %.1f %.1f %.1f ESPrs\n",
-		   margin,
-		   margin,
-		   bboxw - 2 * margin,
-		   bboxl - 2 * margin);
-      else
-	doc_printf(doc, "%.1f %.1f %.1f %.1f ESPrs\n",
-        	   PageLeft + margin,
-		   PageBottom + margin,
-		   PageRight - PageLeft - 2 * margin,
-		   PageTop - PageBottom - 2 * margin);
+    for (; rects > 0; rects --) {
+        if (doc->number_up > 1)
+            doc_printf(doc, "%.1f %.1f %.1f %.1f ESPrs\n",
+                       margin,
+                       margin,
+                       bboxw - 2 * margin,
+                       bboxl - 2 * margin);
+        else
+            doc_printf(doc, "%.1f %.1f %.1f %.1f ESPrs\n",
+                       PageLeft + margin,
+                       PageBottom + margin,
+                       PageRight - PageLeft - 2 * margin,
+                       PageTop - PageBottom - 2 * margin);
+
+        margin += 2 * fscale;
+    }
 
    /*
     * Restore pen settings...

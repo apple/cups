@@ -8,6 +8,8 @@
  * information.
  */
 
+#ifndef _CONF_H
+#define _CONF_H
 
 /*
  * Log levels...
@@ -286,3 +288,5 @@ extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
 extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
 extern int	cupsdReadConfiguration(void);
 extern int	cupsdWriteErrorLog(int level, const char *message);
+
+#endif

@@ -131,11 +131,11 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
 
 #ifdef _WIN32
     fd = open(filename, _O_CREAT | _O_RDWR | _O_TRUNC | _O_BINARY,
-              _S_IREAD | _S_IWRITE);
+              _S_IREAD | _S_IWRITE | O_CLOEXEC);
 #elif defined(O_NOFOLLOW)
-    fd = open(filename, O_RDWR | O_CREAT | O_EXCL | O_NOFOLLOW, 0600);
+    fd = open(filename, O_RDWR | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0600);
 #else
-    fd = open(filename, O_RDWR | O_CREAT | O_EXCL, 0600);
+    fd = open(filename, O_RDWR | O_CREAT | O_EXCL | O_CLOEXEC, 0600);
 #endif /* _WIN32 */
 
     if (fd < 0 && errno != EEXIST)

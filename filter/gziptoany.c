@@ -59,7 +59,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     copies = 1;
     fp     = cupsFileStdin();
   }
-  else if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
+  else if ((fp = cupsFileOpen(argv[6], "re")) == NULL)
   {
     fprintf(stderr, "DEBUG: Unable to open \"%s\".\n", argv[6]);
     _cupsLangPrintError("ERROR", _("Unable to open print file"));

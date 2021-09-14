@@ -463,7 +463,7 @@ get_options(cups_option_t **options)	/* O - Options */
     if ((value = getenv("IPP_SIDES")) == NULL)
       value = getenv("IPP_SIDES_DEFAULT");
 
-    if (value && ppd_cache->sides_option)
+    if (value && ppd_cache && ppd_cache->sides_option)
     {
       if (!strcmp(value, "one-sided") && ppd_cache->sides_1sided)
 	num_options = cupsAddOption(ppd_cache->sides_option, ppd_cache->sides_1sided, num_options, options);
@@ -556,7 +556,7 @@ jpeg_to_ps(const char    *filename,	/* I - Filename */
 
   if (filename)
   {
-    if ((fd = open(filename, O_RDONLY)) < 0)
+    if ((fd = open(filename, O_RDONLY | O_CLOEXEC)) < 0)
     {
       fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", filename, strerror(errno));
       return (1);
@@ -910,7 +910,7 @@ ps_to_ps(const char    *filename,	/* I - Filename */
 
   if (filename)
   {
-    if ((fp = fopen(filename, "rb")) == NULL)
+    if ((fp = fopen(filename, "rbe")) == NULL)
     {
       fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", filename, strerror(errno));
       return (1);
@@ -1034,7 +1034,7 @@ raster_to_ps(const char *filename)	/* I - Filename */
 
   if (filename)
   {
-    if ((fd = open(filename, O_RDONLY)) < 0)
+    if ((fd = open(filename, O_RDONLY | O_CLOEXEC)) < 0)
     {
       fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", filename, strerror(errno));
       return (1);

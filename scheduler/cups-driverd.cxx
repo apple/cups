@@ -970,7 +970,7 @@ get_file(const char *name,		/* I - Name */
   * Try opening the file...
   */
 
-  if ((fp = cupsFileOpen(buffer, "r")) == NULL)
+  if ((fp = cupsFileOpen(buffer, "re")) == NULL)
   {
     fprintf(stderr, "ERROR: [cups-driverd] Unable to open \"%s\" - %s\n",
 	    buffer, strerror(errno));
@@ -1134,7 +1134,7 @@ list_ppds(int        request_id,	/* I - Request ID */
 
     snprintf(newname, sizeof(newname), "%s.%d", filename, (int)getpid());
 
-    if ((fp = cupsFileOpen(newname, "w")) != NULL)
+    if ((fp = cupsFileOpen(newname, "we")) != NULL)
     {
       unsigned ppdsync = PPD_SYNC;	/* Sync word */
 
@@ -2079,21 +2079,21 @@ load_ppd(const char  *filename,		/* I - Real filename */
       char	*start;			/* Start of language */
 
 
-      for (start = line + 15; *start && isspace(*start & 255); start ++);
+      for (start = line + 15; *start && isspace(*start); start ++);
 
       if (*start++ == '\"')
       {
 	while (*start)
 	{
 	  for (ptr = start + 1;
-	       *ptr && *ptr != '\"' && !isspace(*ptr & 255);
+	       *ptr && *ptr != '\"' && !isspace(*ptr);
 	       ptr ++);
 
 	  if (*ptr)
 	  {
 	    *ptr++ = '\0';
 
-	    while (isspace(*ptr & 255))
+	    while (isspace(*ptr))
 	      *ptr++ = '\0';
 	  }
 
@@ -2104,7 +2104,7 @@ load_ppd(const char  *filename,		/* I - Real filename */
     }
     else if (!strncmp(line, "*cupsFax:", 9))
     {
-      for (ptr = line + 9; isspace(*ptr & 255); ptr ++);
+      for (ptr = line + 9; isspace(*ptr); ptr ++);
 
       if (!_cups_strncasecmp(ptr, "true", 4))
 	type = PPD_TYPE_FAX;
@@ -2145,7 +2145,7 @@ load_ppd(const char  *filename,		/* I - Real filename */
   else
     strlcpy(make_model, model_name, sizeof(make_model));
 
-  while (isspace(make_model[0] & 255))
+  while (isspace(make_model[0]))
     _cups_strcpy(make_model, make_model + 1);
 
   if (!make_model[0] || cupsArrayCount(products) == 0 ||
@@ -2179,7 +2179,7 @@ load_ppd(const char  *filename,		/* I - Real filename */
   * Normalize the make and model string...
   */
 
-  while (isspace(manufacturer[0] & 255))
+  while (isspace(manufacturer[0]))
     _cups_strcpy(manufacturer, manufacturer + 1);
 
   if (!_cups_strncasecmp(make_model, manufacturer, strlen(manufacturer)))
@@ -2523,7 +2523,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     * No, file is new/changed, so re-scan it...
     */
 
-    if ((fp = cupsFileOpen(filename, "r")) == NULL)
+    if ((fp = cupsFileOpen(filename, "re")) == NULL)
       continue;
 
    /*
@@ -2598,7 +2598,7 @@ load_ppds_dat(char   *filename,		/* I - Filename buffer */
     snprintf(filename, filesize, "%s/ppds.dat", cups_cachedir);
   }
 
-  if ((fp = cupsFileOpen(filename, "r")) != NULL)
+  if ((fp = cupsFileOpen(filename, "re")) != NULL)
   {
    /*
     * See if we have the right sync word...

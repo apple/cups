@@ -11,6 +11,9 @@
  * Include necessary headers...
  */
 
+#ifndef _COMMON_H
+#define _COMMON_H
+
 #include <cups/string-private.h>
 #include <cups/cups.h>
 #include <cups/ppd.h>
@@ -63,3 +66,5 @@ extern void	WriteTextComment(const char *name, const char *value);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#endif

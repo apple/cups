@@ -413,7 +413,7 @@ cupsSetServer(const char *server)	/* I - Server name */
       cg->server_version = 20;
 
     if (cg->server[0] != '/' && (port = strrchr(cg->server, ':')) != NULL &&
-        !strchr(port, ']') && isdigit(port[1] & 255))
+        !strchr(port, ']') && isdigit(port[1]))
     {
       *port++ = '\0';
 
@@ -763,7 +763,7 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
       passptr = cg->password;
       break;
     }
-    else if ((passch & 255) < 0x20 || passptr >= passend)
+    else if ((unsigned char)passch < 0x20 || passptr >= passend)
       putchar(0x07);
     else
     {
@@ -814,7 +814,7 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
   * Disable input echo and set raw input...
   */
 
-  if ((tty = open("/dev/tty", O_RDONLY)) < 0)
+  if ((tty = open("/dev/tty", O_RDONLY | O_CLOEXEC)) < 0)
     return (NULL);
 
   if (tcgetattr(tty, &original))
@@ -905,7 +905,7 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
       passptr = cg->password;
       break;
     }
-    else if ((passch & 255) < 0x20 || passptr >= passend)
+    else if ((passch) < 0x20 || passptr >= passend)
       putchar(0x07);
     else
     {
@@ -990,7 +990,7 @@ _cupsSetDefaults(void)
   */
 
   snprintf(filename, sizeof(filename), "%s/client.conf", cg->cups_serverroot);
-  if ((fp = cupsFileOpen(filename, "r")) != NULL)
+  if ((fp = cupsFileOpen(filename, "re")) != NULL)
   {
     cups_read_client_conf(fp, &cc);
     cupsFileClose(fp);
@@ -1003,7 +1003,7 @@ _cupsSetDefaults(void)
     */
 
     snprintf(filename, sizeof(filename), "%s/.cups/client.conf", cg->home);
-    if ((fp = cupsFileOpen(filename, "r")) != NULL)
+    if ((fp = cupsFileOpen(filename, "re")) != NULL)
     {
       cups_read_client_conf(fp, &cc);
       cupsFileClose(fp);

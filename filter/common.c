@@ -475,7 +475,7 @@ WriteTextComment(const char *name,	/* I - Comment name ("Title", etc.) */
       if (len >= 251)			/* Keep line < 254 chars */
         break;
 
-      printf("\\%03o", *value & 255);
+      printf("\\%03o", *(unsigned char *)value);
       len += 4;
     }
     else if (*value == '\\')

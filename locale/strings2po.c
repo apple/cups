@@ -67,13 +67,13 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   snprintf(iconv, sizeof(iconv), "iconv -f utf-16 -t utf-8 '%s'", argv[1]);
-  if ((strings = popen(iconv, "r")) == NULL)
+  if ((strings = popen(iconv, "re")) == NULL)
   {
     perror(argv[1]);
     return (1);
   }
 
-  if ((po = fopen(argv[2], "w")) == NULL)
+  if ((po = fopen(argv[2], "we")) == NULL)
   {
     perror(argv[2]);
     pclose(strings);

@@ -21,7 +21,7 @@
 //
 
 static void	add_ui_strings(ppdcDriver *d, ppdcCatalog *catalog);
-static void	usage(void) _CUPS_NORETURN;
+static void	usage() _CUPS_NORETURN;
 
 
 //
@@ -100,7 +100,6 @@ main(int  argc,				// I - Number of command-line arguments
 
 	  default :			// Unknown
 	      usage();
-	      break;
 	}
     }
     else
@@ -236,7 +235,7 @@ add_ui_strings(ppdcDriver  *d,		// I - Driver data
 //
 
 static void
-usage(void)
+usage()
 {
   _cupsLangPuts(stdout, _("Usage: ppdpo [options] -o filename.po filename.drv "
                           "[ ... filenameN.drv ]"));

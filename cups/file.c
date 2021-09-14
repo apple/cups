@@ -556,7 +556,7 @@ cupsFileFind(const char *filename,	/* I - File to find */
   while (*path)
   {
 #ifdef _WIN32
-    if (*path == ';' || (*path == ':' && ((bufptr - buffer) > 1 || !isalpha(buffer[0] & 255))))
+    if (*path == ';' || (*path == ':' && ((bufptr - buffer) > 1 || !isalpha(buffer[0]))))
 #else
     if (*path == ';' || *path == ':')
 #endif /* _WIN32 */
@@ -698,13 +698,13 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
   * Return the next character in the buffer...
   */
 
-  DEBUG_printf(("5cupsFileGetChar: Returning %d...", *(fp->ptr) & 255));
+  DEBUG_printf(("5cupsFileGetChar: Returning %u...", *(unsigned char*)(fp->ptr)));
 
   fp->pos ++;
 
   DEBUG_printf(("6cupsFileGetChar: pos=" CUPS_LLFMT, CUPS_LLCAST fp->pos));
 
-  return (*(fp->ptr)++ & 255);
+  return (*(unsigned char *)(fp->ptr)++);
 }
 
 
@@ -862,7 +862,7 @@ cupsFileGetLine(cups_file_t *fp,	/* I - File to read from */
                 char        *buf,	/* I - Buffer */
                 size_t      buflen)	/* I - Size of buffer */
 {
-  int		ch;			/* Character from file */
+  char		ch;			/* Character from file */
   char		*ptr,			/* Current position in line buffer */
 		*end;			/* End of line buffer */
 
@@ -1090,7 +1090,7 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
 
   if (!filename || !mode ||
       (*mode != 'r' && *mode != 'w' && *mode != 'a' && *mode != 's') ||
-      (*mode == 'a' && isdigit(mode[1] & 255)))
+      (*mode == 'a' && isdigit(mode[1])))
     return (NULL);
 
  /*
@@ -1101,21 +1101,21 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   {
     case 'a' : /* Append file */
         fd = cups_open(filename,
-		       O_RDWR | O_CREAT | O_APPEND | O_LARGEFILE | O_BINARY);
+		       O_RDWR | O_CREAT | O_APPEND | O_LARGEFILE | O_BINARY | O_CLOEXEC);
         break;
 
     case 'r' : /* Read file */
-	fd = open(filename, O_RDONLY | O_LARGEFILE | O_BINARY, 0);
+	fd = open(filename, O_RDONLY | O_LARGEFILE | O_BINARY | O_CLOEXEC, 0);
 	break;
 
     case 'w' : /* Write file */
-        fd = cups_open(filename, O_WRONLY | O_LARGEFILE | O_BINARY);
+        fd = cups_open(filename, O_WRONLY | O_LARGEFILE | O_BINARY | O_CLOEXEC);
 	if (fd < 0 && errno == ENOENT)
 	{
 	  fd = cups_open(filename,
-	                 O_WRONLY | O_CREAT | O_EXCL | O_LARGEFILE | O_BINARY);
+	                 O_WRONLY | O_CREAT | O_EXCL | O_LARGEFILE | O_BINARY | O_CLOEXEC);
 	  if (fd < 0 && errno == EEXIST)
-	    fd = cups_open(filename, O_WRONLY | O_LARGEFILE | O_BINARY);
+	    fd = cups_open(filename, O_WRONLY | O_LARGEFILE | O_BINARY | O_CLOEXEC);
 	}
 
 	if (fd >= 0)
@@ -1207,7 +1207,7 @@ cupsFileOpenFd(int        fd,		/* I - File descriptor */
 
   if (fd < 0 || !mode ||
       (*mode != 'r' && *mode != 'w' && *mode != 'a' && *mode != 's') ||
-      (*mode == 'a' && isdigit(mode[1] & 255)))
+      (*mode == 'a' && isdigit(mode[1])))
     return (NULL);
 
  /*
@@ -1338,7 +1338,7 @@ cupsFilePeekChar(cups_file_t *fp)	/* I - CUPS file */
   * Return the next character in the buffer...
   */
 
-  return (*(fp->ptr) & 255);
+  return (*(unsigned char*)(fp->ptr));
 }
 
 
@@ -2255,7 +2255,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       }
 
       if (bytes < 10 || fp->buf[0] != 0x1f ||
-          (fp->buf[1] & 255) != 0x8b ||
+          (fp->buf[1]) != (char)0x8b ||
           fp->buf[2] != 8 || (fp->buf[3] & 0xe0) != 0)
       {
        /*

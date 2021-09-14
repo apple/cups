@@ -125,7 +125,7 @@ _cupsSNMPDefaultCommunity(void)
     strlcpy(cg->snmp_community, "public", sizeof(cg->snmp_community));
 
     snprintf(line, sizeof(line), "%s/snmp.conf", cg->cups_serverroot);
-    if ((fp = cupsFileOpen(line, "r")) != NULL)
+    if ((fp = cupsFileOpen(line, "re")) != NULL)
     {
       linenum = 0;
       while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
@@ -513,7 +513,7 @@ _cupsSNMPStringToOID(const char *src,	/* I - OID string */
       dstptr ++;
       *dstptr = 0;
     }
-    else if (isdigit(*src & 255))
+    else if (isdigit(*src))
       *dstptr = *dstptr * 10 + *src - '0';
     else
       break;

@@ -239,7 +239,7 @@ struct _cups_dir_s			/**** Directory data structure ****/
   char		directory[1024];	/* Directory filename */
   DIR		*dir;			/* Directory file */
   cups_dentry_t	entry;			/* Directory entry */
-};
+} __attribute__((aligned(128)));
 
 
 /*

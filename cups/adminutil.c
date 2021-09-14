@@ -193,7 +193,7 @@ cupsAdminGetServerSettings(
   if ((status = get_cupsd_conf(http, cg, cg->cupsd_update, cupsdconf,
                                sizeof(cupsdconf), &remote)) == HTTP_STATUS_OK)
   {
-    if ((cupsd = cupsFileOpen(cupsdconf, "r")) == NULL)
+    if ((cupsd = cupsFileOpen(cupsdconf, "re")) == NULL)
     {
       char	message[1024];		/* Message string */
 
@@ -243,7 +243,7 @@ cupsAdminGetServerSettings(
 
 	if ((port = strrchr(value, ':')) != NULL)
 	  *port = '\0';
-	else if (isdigit(*value & 255))
+	else if (isdigit(*value))
 	{
 	 /*
 	  * Listen on a port number implies remote access...
@@ -482,7 +482,7 @@ cupsAdminSetServerSettings(
   if (get_cupsd_conf(http, cg, 0, cupsdconf, sizeof(cupsdconf),
                      &remote) == HTTP_STATUS_OK)
   {
-    if ((cupsd = cupsFileOpen(cupsdconf, "r")) == NULL)
+    if ((cupsd = cupsFileOpen(cupsdconf, "re")) == NULL)
     {
       _cupsSetError(IPP_STATUS_ERROR_INTERNAL, NULL, 0);
       return (0);

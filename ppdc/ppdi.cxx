@@ -21,7 +21,7 @@
 // Local functions...
 //
 
-static void	usage(void) _CUPS_NORETURN;
+static void	usage() _CUPS_NORETURN;
 
 
 //
@@ -71,7 +71,6 @@ main(int  argc,				// I - Number of command-line arguments
 
 	  default :			// Unknown
 	      usage();
-	      break;
         }
     }
     else
@@ -112,7 +111,7 @@ main(int  argc,				// I - Number of command-line arguments
 //
 
 static void
-usage(void)
+usage()
 {
   _cupsLangPuts(stdout, _("Usage: ppdi [options] filename.ppd [ ... "
 			  "filenameN.ppd ]"));

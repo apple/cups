@@ -385,19 +385,19 @@ main(int  argc,				/* I - Number of command-line args */
     * Redirect stdin/out/err to /dev/null...
     */
 
-    if ((i = open("/dev/null", O_RDONLY)) != 0)
+    if ((i = open("/dev/null", O_RDONLY | O_CLOEXEC)) != 0)
     {
       dup2(i, 0);
       close(i);
     }
 
-    if ((i = open("/dev/null", O_WRONLY)) != 1)
+    if ((i = open("/dev/null", O_WRONLY | O_CLOEXEC)) != 1)
     {
       dup2(i, 1);
       close(i);
     }
 
-    if ((i = open("/dev/null", O_WRONLY)) != 2)
+    if ((i = open("/dev/null", O_WRONLY | O_CLOEXEC)) != 2)
     {
       dup2(i, 2);
       close(i);

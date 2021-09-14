@@ -496,7 +496,7 @@ apple_register_profiles(
 
 	if ((profileid_attr = ppdFindAttr(ppd, "cupsProfileID",
 					  attr->spec)) != NULL &&
-	    profileid_attr->value && isdigit(profileid_attr->value[0] & 255))
+	    profileid_attr->value && isdigit(profileid_attr->value[0]))
 	  profile_id = (unsigned)strtoul(profileid_attr->value, NULL, 10);
 	else
 	  profile_id = _ppdHashName(attr->spec);

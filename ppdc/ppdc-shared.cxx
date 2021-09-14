@@ -38,7 +38,7 @@ ppdcShared::~ppdcShared()
 //
 
 void
-ppdcShared::release(void)
+ppdcShared::release()
 {
   use --;
 

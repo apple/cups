@@ -154,7 +154,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    strerror(errno));
     sandbox_free_error(sandbox_error);
 
-    if ((fp = cupsFileOpen(argv[i], "r")) != NULL)
+    if ((fp = cupsFileOpen(argv[i], "re")) != NULL)
     {
       while (cupsFileGets(fp, line, sizeof(line)))
       {

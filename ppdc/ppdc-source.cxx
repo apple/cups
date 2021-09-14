@@ -13,8 +13,8 @@
 //
 
 #include "ppdc-private.h"
-#include <limits.h>
-#include <math.h>
+#include <climits>
+#include <cmath>
 #include <unistd.h>
 #include <cups/raster.h>
 #include "data/epson.h"
@@ -133,7 +133,7 @@ ppdcSource::add_include(const char *d)	// I - Include directory
 //
 
 ppdcDriver *				// O - Driver
-ppdcSource::find_driver(const char *f)	// I - Driver file name
+ppdcSource::find_driver(const char *f) const	// I - Driver file name
 {
   ppdcDriver	*d;			// Current driver
 
@@ -231,7 +231,7 @@ ppdcSource::find_include(
 //
 
 ppdcCatalog *				// O - Message catalog or NULL
-ppdcSource::find_po(const char *l)	// I - Locale name
+ppdcSource::find_po(const char *l) const	// I - Locale name
 {
   ppdcCatalog	*cat;			// Current message catalog
 
@@ -251,7 +251,7 @@ ppdcSource::find_po(const char *l)	// I - Locale name
 //
 
 ppdcMediaSize *				// O - Size
-ppdcSource::find_size(const char *s)	// I - Size name
+ppdcSource::find_size(const char *s) const	// I - Size name
 {
   ppdcMediaSize	*m;			// Current media size
 
@@ -269,7 +269,7 @@ ppdcSource::find_size(const char *s)	// I - Size name
 //
 
 ppdcVariable *				// O - Variable
-ppdcSource::find_variable(const char *n)// I - Variable name
+ppdcSource::find_variable(const char *n) const// I - Variable name
 {
   ppdcVariable	*v;			// Current variable
 
@@ -1243,7 +1243,7 @@ ppdcSource::get_integer(const char *v)	// I - Value string
   if (!v)
     return (-1);
 
-  if (isdigit(*v & 255) || *v == '-' || *v == '+')
+  if (isdigit(*v) || *v == '-' || *v == '+')
   {
     // Return a simple integer value
     val = strtol(v, (char **)&v, 0);
@@ -1270,13 +1270,13 @@ ppdcSource::get_integer(const char *v)	// I - Value string
     while (*v && *v != ')')
     {
       // Skip leading whitespace...
-      while (*v && isspace(*v & 255))
+      while (*v && isspace(*v))
         v ++;
 
       if (!*v || *v == ')')
         break;
 
-      if (isdigit(*v & 255) || *v == '-' || *v == '+')
+      if (isdigit(*v) || *v == '-' || *v == '+')
       {
         // Bitwise OR a number...
 	temp = strtol(v, &newv, 0);
@@ -1289,7 +1289,7 @@ ppdcSource::get_integer(const char *v)	// I - Value string
       {
         // NAME logicop value
 	for (newv = (char *)v + 1;
-	     *newv && (isalnum(*newv & 255) || *newv == '_');
+	     *newv && (isalnum(*newv) || *newv == '_');
 	     newv ++)
 	  /* do nothing */;
 
@@ -1300,7 +1300,7 @@ ppdcSource::get_integer(const char *v)	// I - Value string
 	{
 	  if (!var->value || !var->value->value || !var->value->value[0])
 	    temp = 0;
-	  else if (isdigit(var->value->value[0] & 255) ||
+	  else if (isdigit(var->value->value[0]) ||
 	           var->value->value[0] == '-' ||
 	           var->value->value[0] == '+')
             temp = strtol(var->value->value, NULL, 0);
@@ -1311,7 +1311,7 @@ ppdcSource::get_integer(const char *v)	// I - Value string
 	  temp = 0;
 
         *newv = ch;
-	while (isspace(*newv & 255))
+	while (isspace(*newv))
 	  newv ++;
 
         if (!strncmp(newv, "==", 2))
@@ -1349,13 +1349,13 @@ ppdcSource::get_integer(const char *v)	// I - Value string
 
         if (compop != PPDC_XX)
 	{
-	  while (isspace(*newv & 255))
+	  while (isspace(*newv))
 	    newv ++;
 
           if (*newv == ')' || !*newv)
 	    return (-1);
 
-	  if (isdigit(*newv & 255) || *newv == '-' || *newv == '+')
+	  if (isdigit(*newv) || *newv == '-' || *newv == '+')
 	  {
 	    // Get the second number...
 	    temp2 = strtol(newv, &newv, 0);
@@ -1367,7 +1367,7 @@ ppdcSource::get_integer(const char *v)	// I - Value string
 	  {
 	    // Lookup the second name...
 	    for (v = newv, newv ++;
-		 *newv && (isalnum(*newv & 255) || *newv == '_');
+		 *newv && (isalnum(*newv) || *newv == '_');
 		 newv ++);
 
 	    ch    = *newv;
@@ -1377,7 +1377,7 @@ ppdcSource::get_integer(const char *v)	// I - Value string
 	    {
 	      if (!var->value || !var->value->value || !var->value->value[0])
 		temp2 = 0;
-	      else if (isdigit(var->value->value[0] & 255) ||
+	      else if (isdigit(var->value->value[0]) ||
 		       var->value->value[0] == '-' ||
 		       var->value->value[0] == '+')
 		temp2 = strtol(var->value->value, NULL, 0);
@@ -3447,7 +3447,7 @@ ppdcSource::write_file(const char *f)	// I - File to write
   rename(f, bckname);
 
   // Open the output file...
-  fp = cupsFileOpen(f, "w");
+  fp = cupsFileOpen(f, "we");
 
   if (!fp)
   {

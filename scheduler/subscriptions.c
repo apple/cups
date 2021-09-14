@@ -711,7 +711,7 @@ cupsdLoadAllSubscriptions(void)
       * <Subscription #>
       */
 
-      if (!sub && value && isdigit(value[0] & 255))
+      if (!sub && value && isdigit(value[0]))
       {
 	sub = cupsdAddSubscription(CUPSD_EVENT_NONE, NULL, NULL, NULL,
 				   atoi(value));
@@ -769,7 +769,7 @@ cupsdLoadAllSubscriptions(void)
 
 	for (valueptr = value; !isspace(*valueptr) && *valueptr; valueptr ++);
 
-	while (isspace(*valueptr & 255))
+	while (isspace(*valueptr))
 	  *valueptr++ = '\0';
 
        /*
@@ -825,7 +825,7 @@ cupsdLoadAllSubscriptions(void)
       * JobId #
       */
 
-      if (value && isdigit(*value & 255))
+      if (value && isdigit(*value))
       {
 	if ((sub->job = cupsdFindJob(atoi(value))) == NULL)
 	{
@@ -935,7 +935,7 @@ cupsdLoadAllSubscriptions(void)
       * LeaseDuration #
       */
 
-      if (value && isdigit(*value & 255))
+      if (value && isdigit(*value))
       {
 	sub->lease  = atoi(value);
 	sub->expire = sub->lease ? time(NULL) + sub->lease : 0;
@@ -954,7 +954,7 @@ cupsdLoadAllSubscriptions(void)
       * Interval #
       */
 
-      if (value && isdigit(*value & 255))
+      if (value && isdigit(*value))
 	sub->interval = atoi(value);
       else
       {
@@ -970,7 +970,7 @@ cupsdLoadAllSubscriptions(void)
       * ExpirationTime #
       */
 
-      if (value && isdigit(*value & 255))
+      if (value && isdigit(*value))
 	sub->expire = atoi(value);
       else
       {
@@ -986,7 +986,7 @@ cupsdLoadAllSubscriptions(void)
       * NextEventId #
       */
 
-      if (value && isdigit(*value & 255))
+      if (value && isdigit(*value))
 	sub->next_event_id = sub->first_event_id = atoi(value);
       else
       {

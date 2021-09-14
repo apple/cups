@@ -230,7 +230,7 @@ email_message(const char *to,		/* I - Recipient of message */
 
     if (strchr(mailtoSMTPServer, ':'))
     {
-      fp = cupsFileOpen(mailtoSMTPServer, "s");
+      fp = cupsFileOpen(mailtoSMTPServer, "se");
     }
     else
     {
@@ -238,7 +238,7 @@ email_message(const char *to,		/* I - Recipient of message */
 
 
       snprintf(spec, sizeof(spec), "%s:smtp", mailtoSMTPServer);
-      fp = cupsFileOpen(spec, "s");
+      fp = cupsFileOpen(spec, "se");
     }
 
     if (!fp)
@@ -421,7 +421,7 @@ load_configuration(void)
 
   snprintf(line, sizeof(line), "%s/mailto.conf", server_root);
 
-  if ((fp = cupsFileOpen(line, "r")) == NULL)
+  if ((fp = cupsFileOpen(line, "re")) == NULL)
   {
     if (errno != ENOENT)
     {

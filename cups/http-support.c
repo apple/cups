@@ -41,7 +41,7 @@ typedef struct _http_uribuf_s		/* URI buffer */
 #endif /* HAVE_AVAHI */
   char			*buffer;	/* Pointer to buffer */
   size_t		bufsize;	/* Size of buffer */
-  int			options;	/* Options passed to _httpResolveURI */
+  unsigned			options;	/* Options passed to _httpResolveURI */
   const char		*resource;	/* Resource from URI */
   const char		*uuid;		/* UUID from URI */
 } _http_uribuf_t;
@@ -253,7 +253,7 @@ httpAssembleURI(
              have_ipv6 = strchr(host, ':') && !strstr(host, "._tcp");
          *hostptr && have_ipv6;
          hostptr ++)
-      if (*hostptr != ':' && !isxdigit(*hostptr & 255))
+      if (*hostptr != ':' && !isxdigit(*hostptr))
       {
         have_ipv6 = *hostptr == '%';
         break;
@@ -720,14 +720,14 @@ httpEncode64_2(char       *out,		/* I - String to write to */
     */
 
     if (outptr < outend)
-      *outptr ++ = base64[(in[0] & 255) >> 2];
+      *outptr ++ = base64[(in[0]) >> 2];
 
     if (outptr < outend)
     {
       if (inlen > 1)
-        *outptr ++ = base64[(((in[0] & 255) << 4) | ((in[1] & 255) >> 4)) & 63];
+        *outptr ++ = base64[(((in[0]) << 4) | ((in[1]) >> 4)) & 63];
       else
-        *outptr ++ = base64[((in[0] & 255) << 4) & 63];
+        *outptr ++ = base64[((in[0]) << 4) & 63];
     }
 
     in ++;
@@ -744,9 +744,9 @@ httpEncode64_2(char       *out,		/* I - String to write to */
     if (outptr < outend)
     {
       if (inlen > 1)
-        *outptr ++ = base64[(((in[0] & 255) << 2) | ((in[1] & 255) >> 6)) & 63];
+        *outptr ++ = base64[(((in[0]) << 2) | ((in[1]) >> 6)) & 63];
       else
-        *outptr ++ = base64[((in[0] & 255) << 2) & 63];
+        *outptr ++ = base64[((in[0]) << 2) & 63];
     }
 
     in ++;
@@ -1112,7 +1112,7 @@ httpSeparateURI(
 
         uri ++;
 
-        while (isxdigit(*uri & 255))
+        while (isxdigit(*uri))
           uri ++;
 
         if (*uri != '.')
@@ -1163,7 +1163,7 @@ httpSeparateURI(
 
 	  break;
 	}
-	else if (*ptr != ':' && *ptr != '.' && !isxdigit(*ptr & 255))
+	else if (*ptr != ':' && *ptr != '.' && !isxdigit(*ptr))
 	{
 	  *host = '\0';
 	  return (HTTP_URI_STATUS_BAD_HOSTNAME);
@@ -1225,7 +1225,7 @@ httpSeparateURI(
       * Yes, collect the port number...
       */
 
-      if (!isdigit(uri[1] & 255))
+      if (!isdigit(uri[1]))
       {
         *port = 0;
         return (HTTP_URI_STATUS_BAD_PORT);
@@ -1722,7 +1722,7 @@ _httpResolveURI(
     const char *uri,			/* I - DNS-SD URI */
     char       *resolved_uri,		/* I - Buffer for resolved URI */
     size_t     resolved_size,		/* I - Size of URI buffer */
-    int        options,			/* I - Resolve options */
+    unsigned        options,			/* I - Resolve options */
     int        (*cb)(void *context),	/* I - Continue callback function */
     void       *context)		/* I - Context pointer for callback */
 {
@@ -2178,7 +2178,7 @@ http_copy_decode(char       *dst,	/* O - Destination buffer */
     {
       if (*src == '%' && decode)
       {
-        if (isxdigit(src[1] & 255) && isxdigit(src[2] & 255))
+        if (isxdigit(src[1]) && isxdigit(src[2]))
 	{
 	 /*
 	  * Grab a hex-encoded character...
@@ -2208,7 +2208,7 @@ http_copy_decode(char       *dst,	/* O - Destination buffer */
 	  return (NULL);
 	}
       }
-      else if ((*src & 255) <= 0x20 || (*src & 255) >= 0x7f)
+      else if ((*(unsigned char *)src) <= 0x20 || (*(unsigned char *)src) >= 0x7f)
       {
         *ptr = '\0';
         return (NULL);

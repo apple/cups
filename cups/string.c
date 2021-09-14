@@ -421,7 +421,7 @@ _cupsStrScand(const char   *buf,	/* I - Pointer to number */
   if (*buf == '-' || *buf == '+')
     *tempptr++ = *buf++;
 
-  while (isdigit(*buf & 255))
+  while (isdigit(*buf))
     if (tempptr < (temp + sizeof(temp) - 1))
       *tempptr++ = *buf++;
     else
@@ -455,7 +455,7 @@ _cupsStrScand(const char   *buf,	/* I - Pointer to number */
       return (0.0);
     }
 
-    while (isdigit(*buf & 255))
+    while (isdigit(*buf))
       if (tempptr < (temp + sizeof(temp) - 1))
 	*tempptr++ = *buf++;
       else
@@ -496,7 +496,7 @@ _cupsStrScand(const char   *buf,	/* I - Pointer to number */
       }
     }
 
-    while (isdigit(*buf & 255))
+    while (isdigit(*buf))
       if (tempptr < (temp + sizeof(temp) - 1))
 	*tempptr++ = *buf++;
       else

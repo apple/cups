@@ -7,6 +7,9 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _CLASSES_H
+#define _CLASSES_H
+
 
 /*
  * Prototypes...
@@ -22,3 +25,5 @@ extern cupsd_printer_t	*cupsdFindAvailablePrinter(const char *name);
 extern cupsd_printer_t	*cupsdFindClass(const char *name);
 extern void		cupsdLoadAllClasses(void);
 extern void		cupsdSaveAllClasses(void);
+
+#endif

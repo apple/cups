@@ -48,8 +48,7 @@
 unsigned char	*Planes[6],		/* Output buffers */
 		*CompBuffer,		/* Compression buffer */
 		*LineBuffers[2];	/* Line bitmap buffers */
-int		Model,			/* Model number */
-		EjectPage,		/* Eject the page when done? */
+int		Model,            /* Model number */
 		Shingling,		/* Shingle output? */
 		Canceled;		/* Has the current job been canceled? */
 unsigned	NumPlanes,		/* Number of color planes */
@@ -877,7 +876,7 @@ OutputRows(
 
     n = dot_count / DotBytes;
     putchar((int)(n & 255));
-    putchar((int)(n / 256));
+    putchar((int)(n >> 8));
 
    /*
     * Write the graphics data...
@@ -909,7 +908,7 @@ OutputRows(
       {
 	putchar(0x1b);
 	putchar('$');
-	putchar((int)(i & 255));
+	putchar((int)(i));
 	putchar((int)(i >> 8));
       }
 
@@ -918,9 +917,9 @@ OutputRows(
       else
       	printf("\033*\003");		/* Select bit image */
 
-      n = (unsigned)dot_count / DotBytes;
+      n = dot_count / DotBytes;
       putchar((int)(n & 255));
-      putchar((int)(n / 256));
+      putchar((int)(n >> 8));
 
       for (n = dot_count / 2, ptr = dot_ptr + 1; n > 0; n --, ptr += 2)
       {
@@ -955,7 +954,7 @@ OutputRows(
   * Clear the buffer...
   */
 
-  memset(LineBuffers[row], 0, header->cupsWidth * DotBytes);
+  memset(LineBuffers[row], 0, (size_t)header->cupsWidth * (size_t)DotBytes);
 }
 
 
@@ -1007,7 +1006,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc == 7)
   {
-    if ((fd = open(argv[6], O_RDONLY)) == -1)
+    if ((fd = open(argv[6], O_RDONLY | O_CLOEXEC)) == -1)
     {
       _cupsLangPrintError("ERROR", _("Unable to open raster file"));
       sleep(1);

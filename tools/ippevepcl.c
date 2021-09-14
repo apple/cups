@@ -264,7 +264,7 @@ pcl_to_pcl(const char *filename)	/* I - File to print or NULL for stdin */
 
   if (filename)
   {
-    if ((fd = open(filename, O_RDONLY)) < 0)
+    if ((fd = open(filename, O_RDONLY | O_CLOEXEC)) < 0)
     {
       fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", filename, strerror(errno));
       return (1);
@@ -469,7 +469,7 @@ raster_to_pcl(const char *filename)	/* I - File to print (NULL for stdin) */
 
   if (filename)
   {
-    if ((fd = open(filename, O_RDONLY)) < 0)
+    if ((fd = open(filename, O_RDONLY | O_CLOEXEC)) < 0)
     {
       fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", filename, strerror(errno));
       return (1);

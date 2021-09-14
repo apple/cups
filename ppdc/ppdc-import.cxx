@@ -60,7 +60,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
   if ((driver = find_driver(ppd->pcfilename)) == NULL)
   {
     // Create a new PPD file...
-    if ((fp = cupsFileOpen(f, "r")) == NULL)
+    if ((fp = cupsFileOpen(f, "re")) == NULL)
     {
       ppdClose(ppd);
       return (0);
@@ -132,13 +132,13 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
       strlcpy(line, ppd->filters[i], sizeof(line));
 
       for (ptr = line; *ptr; ptr ++)
-        if (isspace(*ptr & 255))
+        if (isspace(*ptr))
 	  break;
       *ptr++ = '\0';
 
       cost = strtol(ptr, &ptr, 10);
 
-      while (isspace(*ptr & 255))
+      while (isspace(*ptr))
         ptr ++;
 
       filter = new ppdcFilter(line, ptr, cost);
@@ -297,11 +297,11 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
 	    ((ptr - attr->name) == 2 || (ptr - attr->name) == 5))
 	{
 	  // Might be a localization attribute; test further...
-	  if (isalpha(attr->name[0] & 255) &&
-	      isalpha(attr->name[1] & 255) &&
+	  if (isalpha(attr->name[0]) &&
+	      isalpha(attr->name[1]) &&
 	      (attr->name[2] == '.' ||
-	       (attr->name[2] == '_' && isalpha(attr->name[3] & 255) &&
-	        isalpha(attr->name[4] & 255))))
+	       (attr->name[2] == '_' && isalpha(attr->name[3]) &&
+	        isalpha(attr->name[4]))))
             continue;
 	}
 

@@ -1196,10 +1196,10 @@ query_callback(
         *valptr++ = ',';
 
       ptr += 6;
-      while (isalnum(*ptr & 255) || *ptr == '-' || *ptr == '.')
+      while (isalnum(*ptr) || *ptr == '-' || *ptr == '.')
       {
-        if (isalnum(*ptr & 255) && valptr < (value + sizeof(value) - 1))
-          *valptr++ = (char)toupper(*ptr++ & 255);
+        if (isalnum(*ptr) && valptr < (value + sizeof(value) - 1))
+          *valptr++ = (char)toupper(*ptr++);
         else
           break;
       }
@@ -1272,8 +1272,8 @@ unquote(char       *dst,		/* I - Destination buffer */
     if (*src == '\\')
     {
       src ++;
-      if (isdigit(src[0] & 255) && isdigit(src[1] & 255) &&
-          isdigit(src[2] & 255))
+      if (isdigit(src[0]) && isdigit(src[1]) &&
+          isdigit(src[2]))
       {
         *dst++ = ((((src[0] - '0') * 10) + src[1] - '0') * 10) + src[2] - '0';
 	src += 3;

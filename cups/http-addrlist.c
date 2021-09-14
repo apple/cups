@@ -131,7 +131,7 @@ httpAddrConnect2(
 
       DEBUG_printf(("2httpAddrConnect2: Trying %s:%d...", httpAddrString(&(addrlist->addr), temp, sizeof(temp)), httpAddrPort(&(addrlist->addr))));
 
-      if ((fds[nfds] = (int)socket(httpAddrFamily(&(addrlist->addr)), SOCK_STREAM, 0)) < 0)
+      if ((fds[nfds] = socket(httpAddrFamily(&(addrlist->addr)), SOCK_STREAM, 0)) < 0)
       {
        /*
 	* Don't abort yet, as this could just be an issue with the local
@@ -686,7 +686,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
       if (!service)
 	portnum = 0;
-      else if (isdigit(*service & 255))
+      else if (isdigit(*service))
 	portnum = atoi(service);
       else if ((port = getservbyname(service, NULL)) != NULL)
 	portnum = ntohs(port->s_port);
@@ -713,7 +713,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
       * to get the right byte order for the address.
       */
 
-      for (ptr = hostname; isdigit(*ptr & 255) || *ptr == '.'; ptr ++);
+      for (ptr = hostname; isdigit(*ptr) || *ptr == '.'; ptr ++);
 
       if (!*ptr)
       {
@@ -813,7 +813,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
     if (!service)
       portnum = 0;
-    else if (isdigit(*service & 255))
+    else if (isdigit(*service))
       portnum = atoi(service);
     else if ((port = getservbyname(service, NULL)) != NULL)
       portnum = ntohs(port->s_port);

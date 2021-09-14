@@ -68,7 +68,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       */
 
       for (params = line + strlen(line) - 1; params >= line;)
-        if (!isspace(*params & 255))
+        if (!isspace(*params))
 	  break;
 	else
 	  *params-- = '\0';
@@ -77,7 +77,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Strip leading whitespace...
       */
 
-      for (params = line; isspace(*params & 255); params ++);
+      for (params = line; isspace(*params); params ++);
 
       if (params > line)
         _cups_strcpy(line, params);
@@ -97,14 +97,14 @@ main(int  argc,				/* I - Number of command-line arguments */
       */
 
       for (params = line; *params != '\0'; params ++)
-        if (isspace(*params & 255))
+        if (isspace(*params))
 	  break;
 
      /*
       * Remove whitespace between the command and parameters...
       */
 
-      while (isspace(*params & 255))
+      while (isspace(*params))
         *params++ = '\0';
 
      /*
@@ -359,7 +359,7 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 	  * Skip leading whitespace and commas...
 	  */
 
-	  while (isspace(*dptr & 255) || *dptr == ',')
+	  while (isspace(*dptr) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -375,7 +375,7 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 	    /* do nothing */;
 
           if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' ||
-	                       isspace(*dptr & 255)))
+	                       isspace(*dptr)))
 	  {
 	    match = 1;
 	    break;
@@ -385,9 +385,9 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr & 255) && *dptr != '\0')
+          while (!isspace(*dptr) && *dptr != '\0')
 	    dptr ++;
-	  while (isspace(*dptr & 255) || *dptr == ',')
+	  while (isspace(*dptr) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')

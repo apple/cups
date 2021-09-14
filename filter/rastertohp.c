@@ -676,7 +676,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc == 7)
   {
-    if ((fd = open(argv[6], O_RDONLY)) == -1)
+    if ((fd = open(argv[6], O_RDONLY | O_CLOEXEC)) == -1)
     {
       _cupsLangPrintError("ERROR", _("Unable to open raster file"));
       sleep(1);

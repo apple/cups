@@ -27,7 +27,7 @@ ppdcFile::ppdcFile(const char  *f,		// I - File to open
     cupsFileRewind(fp);
   }
   else
-    fp = cupsFileOpen(f, "r");
+    fp = cupsFileOpen(f, "re");
 
   close_on_delete = !ffp;
   filename        = f;
@@ -81,7 +81,7 @@ ppdcFile::get()
 //
 
 int					// O - Next character in file
-ppdcFile::peek()
+ppdcFile::peek() const
 {
   // Return immediaely if there is no open file...
   if (!fp)

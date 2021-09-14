@@ -368,7 +368,7 @@ main(int  argc,				/* I - Number of command-line args */
 
         for (i = 6; i < argc && !status && !job_canceled; i ++)
 	{
-	  if ((fd = open(argv[i], O_RDONLY)) >= 0)
+	  if ((fd = open(argv[i], O_RDONLY | O_CLOEXEC)) >= 0)
 	  {
 	    status = run_as_user(argv, uid, device_uri, fd);
 	    close(fd);
@@ -1628,7 +1628,7 @@ main(int  argc,				/* I - Number of command-line args */
 
         if (num_files == 1)
         {
-	  if ((fd = open(files[0], O_RDONLY)) < 0)
+	  if ((fd = open(files[0], O_RDONLY | O_CLOEXEC)) < 0)
 	  {
 	    _cupsLangPrintError("ERROR", _("Unable to open print file"));
 	    return (CUPS_BACKEND_FAILED);
@@ -1841,7 +1841,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  }
 	  else
 	  {
-	    if ((fd = open(files[i], O_RDONLY)) < 0)
+	    if ((fd = open(files[i], O_RDONLY | O_CLOEXEC)) < 0)
 	    {
 	      _cupsLangPrintError("ERROR", _("Unable to open print file"));
 	      return (CUPS_BACKEND_FAILED);

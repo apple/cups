@@ -61,7 +61,7 @@ main(int  argc,				/* I - Number of command-line args */
   }
   else if (argc == 7)
   {
-    if ((fd = open(argv[6], O_RDONLY)) < 0)
+    if ((fd = open(argv[6], O_RDONLY | O_CLOEXEC)) < 0)
     {
       perror("ERROR: Unable to open print file");
       return (1);

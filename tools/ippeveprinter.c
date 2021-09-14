@@ -588,7 +588,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  case 'p' : /* -p port */
 	      i ++;
-	      if (i >= argc || !isdigit(argv[i][0] & 255))
+	      if (i >= argc || !isdigit(argv[i][0]))
 	        usage(1);
 
 	      serverport = atoi(argv[i]);
@@ -776,7 +776,7 @@ authenticate_request(
   }
 
   authorization += 5;
-  while (isspace(*authorization & 255))
+  while (isspace(*authorization))
     authorization ++;
 
   userlen = sizeof(data.username);
@@ -1244,15 +1244,15 @@ create_job_file(
 
   for (nameptr = name; *job_name && nameptr < (name + sizeof(name) - 1); job_name ++)
   {
-    if (isalnum(*job_name & 255) || *job_name == '-')
+    if (isalnum(*job_name) || *job_name == '-')
     {
-      *nameptr++ = (char)tolower(*job_name & 255);
+      *nameptr++ = (char)tolower(*job_name);
     }
     else
     {
       *nameptr++ = '_';
 
-      while (job_name[1] && !isalnum(job_name[1] & 255) && job_name[1] != '-')
+      while (job_name[1] && !isalnum(job_name[1]) && job_name[1] != '-')
         job_name ++;
     }
   }
@@ -2357,7 +2357,7 @@ find_job(ippeve_client_t *client)		/* I - Client */
     const char *uriptr = strrchr(uri, '/');
 					/* Pointer to the last slash in the URI */
 
-    if (uriptr && isdigit(uriptr[1] & 255))
+    if (uriptr && isdigit(uriptr[1]))
       key.id = atoi(uriptr + 1);
     else
       return (NULL);
@@ -3001,7 +3001,7 @@ html_printf(ippeve_client_t *client,	/* I - Client */
       {
 	width = 0;
 
-	while (isdigit(*format & 255))
+	while (isdigit(*format))
 	{
 	  if (tptr < (tformat + sizeof(tformat) - 1))
 	    *tptr++ = *format;
@@ -3033,7 +3033,7 @@ html_printf(ippeve_client_t *client,	/* I - Client */
 	{
 	  prec = 0;
 
-	  while (isdigit(*format & 255))
+	  while (isdigit(*format))
 	  {
 	    if (tptr < (tformat + sizeof(tformat) - 1))
 	      *tptr++ = *format;
@@ -4321,7 +4321,7 @@ load_legacy_attributes(
     "oe_photo-l_3.5x5in",		/* Photo L */
     "na_index-4x6_4x6in",		/* Photo 4x6 */
     "iso_a6_105x148mm",			/* A6 */
-    "na_5x7_5x7in"			/* Photo 5x7 aka 2L */
+    "na_5x7_5x7in",			/* Photo 5x7 aka 2L */
     "iso_a5_148x210mm",			/* A5 */
   };
   static const char * const media_ready[] =
@@ -6014,7 +6014,7 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
 
   ptr = strrchr(client->host_field, '.');
 
-  if (!isdigit(client->host_field[0] & 255) && client->host_field[0] != '[' && strcmp(client->host_field, client->printer->hostname) && strcmp(client->host_field, "localhost") &&
+  if (!isdigit(client->host_field[0]) && client->host_field[0] != '[' && strcmp(client->host_field, client->printer->hostname) && strcmp(client->host_field, "localhost") &&
       (!ptr || (strcmp(ptr, ".local") && strcmp(ptr, ".local."))))
   {
     fprintf(stderr, "%s Bad Host: header '%s'.\n", client->hostname, client->host_field);
@@ -6719,7 +6719,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
         if (*name == '-')
 	  *valptr++ = '_';
 	else
-	  *valptr++ = (char)toupper(*name & 255);
+	  *valptr++ = (char)toupper(*name);
 
 	name ++;
       }
@@ -6752,7 +6752,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
         if (*name == '-')
 	  *valptr++ = '_';
 	else
-	  *valptr++ = (char)toupper(*name & 255);
+	  *valptr++ = (char)toupper(*name);
 
 	name ++;
       }
@@ -6800,7 +6800,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
         {
           if (errno == ENOENT)
           {
-            if ((mystdout = open(resource, O_WRONLY | O_CREAT | O_TRUNC, 0666)) >= 0)
+            if ((mystdout = open(resource, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0666)) >= 0)
 	      fprintf(stderr, "[Job %d] Saving print command output to \"%s\".\n", job->id, resource);
 	    else
 	      fprintf(stderr, "[Job %d] Unable to create \"%s\": %s\n", job->id, resource, strerror(errno));
@@ -6817,12 +6817,12 @@ process_job(ippeve_job_t *job)		/* I - Job */
         }
 	else if (!S_ISREG(fileinfo.st_mode))
 	{
-	  if ((mystdout = open(resource, O_WRONLY | O_CREAT | O_TRUNC, 0666)) >= 0)
+	  if ((mystdout = open(resource, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0666)) >= 0)
 	    fprintf(stderr, "[Job %d] Saving print command output to \"%s\".\n", job->id, resource);
 	  else
             fprintf(stderr, "[Job %d] Unable to create \"%s\": %s\n", job->id, resource, strerror(errno));
 	}
-        else if ((mystdout = open(resource, O_WRONLY)) >= 0)
+        else if ((mystdout = open(resource, O_WRONLY | O_CLOEXEC)) >= 0)
 	  fprintf(stderr, "[Job %d] Saving print command output to \"%s\".\n", job->id, resource);
 	else
 	  fprintf(stderr, "[Job %d] Unable to open \"%s\": %s\n", job->id, resource, strerror(errno));
@@ -6852,7 +6852,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
     }
 
     if (mystdout < 0)
-      mystdout = open("/dev/null", O_WRONLY);
+      mystdout = open("/dev/null", O_WRONLY | O_CLOEXEC);
 
     if (pipe(mypipe))
     {

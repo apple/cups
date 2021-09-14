@@ -15,7 +15,7 @@
 //
 
 #  include <cups/file.h>
-#  include <stdlib.h>
+#  include <cstdlib>
 
 
 //
@@ -110,7 +110,7 @@ class ppdcArray				//// Shared Array
 		current;		// Current element
   ppdcShared	**data;			// Elements
 
-  ppdcArray(ppdcArray *a = 0);
+  explicit ppdcArray(ppdcArray *a = 0);
   ~ppdcArray();
 
   PPDC_NAME("ppdcArray")
@@ -128,7 +128,7 @@ class ppdcString			//// Shared String
 
   char		*value;			// String value
 
-  ppdcString(const char *v);
+  explicit ppdcString(const char *v);
   ~ppdcString();
 
   PPDC_NAME("ppdcString")
@@ -141,7 +141,7 @@ class ppdcInteger			//// Shared integer
 
   int		*value;			// Integer value
 
-  ppdcInteger(int *v) { value = v; }
+  explicit ppdcInteger(int *v) { value = v; }
 
   PPDC_NAME("ppdcInteger")
 };
@@ -169,15 +169,15 @@ class ppdcCatalog			//// Translation catalog
   ppdcString	*filename;		// Name of translation file
   ppdcArray	*messages;		// Array of translation messages
 
-  ppdcCatalog(const char *l, const char *f = 0);
+  explicit ppdcCatalog(const char *l, const char *f = 0);
   ~ppdcCatalog();
 
   PPDC_NAME("ppdcCatalog")
 
-  void		add_message(const char *id, const char *string = NULL);
-  const char	*find_message(const char *id);
+  void		add_message(const char *id, const char *string = NULL) const;
+  const char	*find_message(const char *id) const;
   int		load_messages(const char *f);
-  int		save_messages(const char *f);
+  int		save_messages(const char *f) const;
 };
 
 class ppdcAttr				//// Attribute
@@ -246,13 +246,13 @@ class ppdcOption			//// Option
 
   ppdcOption(ppdcOptType ot, const char *n, const char *t, ppdcOptSection s,
              float o);
-  ppdcOption(ppdcOption *o);
+  explicit ppdcOption(ppdcOption *o);
   ~ppdcOption();
 
   PPDC_NAME("ppdcOption")
 
-  void		add_choice(ppdcChoice *c) { choices->add(c); }
-  ppdcChoice	*find_choice(const char *n);
+  void		add_choice(ppdcChoice *c) const { choices->add(c); }
+  ppdcChoice	*find_choice(const char *n) const;
   void		set_defchoice(ppdcChoice *c);
 };
 
@@ -266,13 +266,13 @@ class ppdcGroup			//// Group of Options
   ppdcArray	*options;		// Options
 
   ppdcGroup(const char *n, const char *t);
-  ppdcGroup(ppdcGroup *g);
+  explicit ppdcGroup(ppdcGroup *g);
   ~ppdcGroup();
 
   PPDC_NAME("ppdcGroup")
 
-  void		add_option(ppdcOption *o) { options->add(o); }
-  ppdcOption	*find_option(const char *n);
+  void		add_option(ppdcOption *o) const { options->add(o); }
+  ppdcOption	*find_option(const char *n) const;
 };
 
 class ppdcConstraint			//// Constraint
@@ -386,26 +386,26 @@ class ppdcDriver			//// Printer Driver Data
 		min_width,		// Minimum width (points)
 		min_length;		// Minimum length (points)
 
-  ppdcDriver(ppdcDriver *d = 0);
+  explicit ppdcDriver(ppdcDriver *d = 0);
   ~ppdcDriver();
 
   PPDC_NAME("ppdcDriver")
 
-  void		add_attr(ppdcAttr *a) { attrs->add(a); }
-  void		add_constraint(ppdcConstraint *c) { constraints->add(c); }
-  void		add_copyright(const char *c) {
+  void		add_attr(ppdcAttr *a) const { attrs->add(a); }
+  void		add_constraint(ppdcConstraint *c) const { constraints->add(c); }
+  void		add_copyright(const char *c) const {
     		  copyright->add(new ppdcString(c));
 		}
-  void		add_filter(ppdcFilter *f) { filters->add(f); }
-  void		add_font(ppdcFont *f) { fonts->add(f); }
-  void		add_group(ppdcGroup *g) { groups->add(g); }
-  void		add_profile(ppdcProfile *p) { profiles->add(p); }
-  void		add_size(ppdcMediaSize *m) { sizes->add(m); }
+  void		add_filter(ppdcFilter *f) const { filters->add(f); }
+  void		add_font(ppdcFont *f) const { fonts->add(f); }
+  void		add_group(ppdcGroup *g) const { groups->add(g); }
+  void		add_profile(ppdcProfile *p) const { profiles->add(p); }
+  void		add_size(ppdcMediaSize *m) const { sizes->add(m); }
 
-  ppdcAttr	*find_attr(const char *k, const char *s);
-  ppdcGroup	*find_group(const char *n);
+  ppdcAttr	*find_attr(const char *k, const char *s) const;
+  ppdcGroup	*find_group(const char *n) const;
   ppdcOption	*find_option(const char *n);
-  ppdcOption	*find_option_group(const char *n, ppdcGroup **mg);
+  ppdcOption	*find_option_group(const char *n, ppdcGroup **mg) const;
 
   void		set_custom_size_code(const char *c);
   void		set_default_font(ppdcFont *f);
@@ -446,11 +446,11 @@ class ppdcFile				//// File
   const char	*filename;		// Filename
   int		line;			// Line in file
 
-  ppdcFile(const char *f, cups_file_t *ffp = (cups_file_t *)0);
+  explicit ppdcFile(const char *f, cups_file_t *ffp = (cups_file_t *)0);
   ~ppdcFile();
 
   int		get();
-  int		peek();
+  int		peek() const;
 };
 
 class ppdcSource			//// Source File
@@ -472,25 +472,25 @@ class ppdcSource			//// Source File
 		cond_stack[101];	// #if state stack
 
 
-  ppdcSource(const char *f = 0, cups_file_t *ffp = (cups_file_t *)0);
+  explicit ppdcSource(const char *f = 0, cups_file_t *ffp = (cups_file_t *)0);
   ~ppdcSource();
 
   PPDC_NAME("ppdcSource")
 
   static void	add_include(const char *d);
-  ppdcDriver	*find_driver(const char *f);
+  ppdcDriver	*find_driver(const char *f) const;
   static char	*find_include(const char *f, const char *base, char *n,
 			      int nlen);
-  ppdcCatalog	*find_po(const char *l);
-  ppdcMediaSize	*find_size(const char *s);
-  ppdcVariable	*find_variable(const char *n);
+  ppdcCatalog	*find_po(const char *l) const;
+  ppdcMediaSize	*find_size(const char *s) const;
+  ppdcVariable	*find_variable(const char *n) const;
   ppdcAttr	*get_attr(ppdcFile *fp, bool loc = false);
   int		get_boolean(ppdcFile *fp);
   ppdcChoice	*get_choice(ppdcFile *fp);
   ppdcChoice	*get_color_model(ppdcFile *fp);
-  int		get_color_order(const char *co);
+  static int		get_color_order(const char *co);
   ppdcProfile	*get_color_profile(ppdcFile *fp);
-  int		get_color_space(const char *cs);
+  static int		get_color_space(const char *cs);
   ppdcConstraint *get_constraint(ppdcFile *fp);
   ppdcMediaSize	*get_custom_size(ppdcFile *fp);
   void		get_duplex(ppdcFile *fp, ppdcDriver *d);
@@ -512,7 +512,7 @@ class ppdcSource			//// Source File
   char		*get_token(ppdcFile *fp, char *buffer, int buflen);
   ppdcVariable	*get_variable(ppdcFile *fp);
   int		import_ppd(const char *f);
-  int		quotef(cups_file_t *fp, const char *format, ...);
+  static int		quotef(cups_file_t *fp, const char *format, ...);
   void		read_file(const char *f, cups_file_t *ffp = (cups_file_t *)0);
   void		scan_file(ppdcFile *fp, ppdcDriver *td = 0, bool inc = false);
   ppdcVariable	*set_variable(const char *name, const char *value);
