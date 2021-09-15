@@ -4321,7 +4321,7 @@ load_legacy_attributes(
     "oe_photo-l_3.5x5in",		/* Photo L */
     "na_index-4x6_4x6in",		/* Photo 4x6 */
     "iso_a6_105x148mm",			/* A6 */
-    "na_5x7_5x7in"			/* Photo 5x7 aka 2L */
+    "na_5x7_5x7in",			/* Photo 5x7 aka 2L */
     "iso_a5_148x210mm",			/* A5 */
   };
   static const char * const media_ready[] =
