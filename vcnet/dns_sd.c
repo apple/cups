@@ -102,7 +102,7 @@ DNSServiceErrorType DNSSD_API DNSServiceAddRecord
   if (dnssd_add_record)
     return (*dnssd_add_record)(sdRef, RecordRef, flags, rrtype, rdlen, rdata, ttl);
   else
-    return (-1);
+    return (kDNSServiceErr_ServiceNotRunning);
 }
 
 
@@ -124,7 +124,7 @@ DNSServiceErrorType DNSSD_API DNSServiceBrowse
   if (dnssd_browse)
     return (*dnssd_browse)(sdRef, flags, interfaceIndex, regtype, domain, callBack, context);
   else
-    return (-1);
+    return (kDNSServiceErr_ServiceNotRunning);
 }
 
 
@@ -156,7 +156,7 @@ DNSServiceErrorType DNSSD_API DNSServiceCreateConnection(DNSServiceRef *sdRef)
   if (dnssd_create_connection)
     return (*dnssd_create_connection)(sdRef);
   else
-    return (-1);
+    return (kDNSServiceErr_ServiceNotRunning);
 }
 
 
@@ -169,7 +169,7 @@ DNSServiceErrorType DNSSD_API DNSServiceProcessResult(DNSServiceRef sdRef)
   if (dnssd_process_result)
     return (*dnssd_process_result)(sdRef);
   else
-    return (-1);
+    return (kDNSServiceErr_ServiceNotRunning);
 }
 
 
@@ -192,7 +192,7 @@ DNSServiceErrorType DNSSD_API DNSServiceQueryRecord
   if (dnssd_query_record)
     return (*dnssd_query_record)(sdRef, flags, interfaceIndex, fullname, rrtype, rrclass, callBack, context);
   else
-    return (-1);
+    return (kDNSServiceErr_ServiceNotRunning);
 }
 
 
@@ -216,7 +216,7 @@ int DNSSD_API DNSServiceRefSockFD(DNSServiceRef sdRef)
   if (dnssd_sock_fd)
     return (*dnssd_sock_fd)(sdRef);
   else
-    return (-1);
+    return (kDNSServiceErr_ServiceNotRunning);
 }
 
 
@@ -243,7 +243,7 @@ DNSServiceErrorType DNSSD_API DNSServiceRegister
   if (dnssd_register)
     return (*dnssd_register)(sdRef, flags, interfaceIndex, name, regtype, domain, host, port, txtLen, txtRecord, callBack, context);
   else
-    return (-1);
+    return (kDNSServiceErr_ServiceNotRunning);
 }
 
 
@@ -261,7 +261,7 @@ DNSServiceErrorType DNSSD_API DNSServiceRemoveRecord
   if (dnssd_remove_record)
     return (*dnssd_remove_record)(sdRef, RecordRef, flags);
   else
-    return (-1);
+    return (kDNSServiceErr_ServiceNotRunning);
 }
 
 
@@ -284,7 +284,7 @@ DNSServiceErrorType DNSSD_API DNSServiceResolve
   if (dnssd_resolve)
     return (*dnssd_resolve)(sdRef, flags, interfaceIndex, name, regtype, domain, callBack, context);
   else
-    return (-1);
+    return (kDNSServiceErr_ServiceNotRunning);
 }
 
 
@@ -305,7 +305,7 @@ DNSServiceErrorType DNSSD_API DNSServiceUpdateRecord
   if (dnssd_update_record)
     return (*dnssd_update_record)(sdRef, RecordRef, flags, rdlen, rdata, ttl);
   else
-    return (-1);
+    return (kDNSServiceErr_ServiceNotRunning);
 }
 
 
