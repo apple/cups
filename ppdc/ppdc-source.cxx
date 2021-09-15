@@ -537,7 +537,7 @@ ppdcSource::get_color_profile(
   for (i = 0; i < 9; i ++)
     m[i] = get_float(fp);
 
-  return (new ppdcProfile(resolution, media_type, g, d, m));
+  return (new ppdcProfile(resolution, media_type, d, g, m));
 }
 
 
@@ -1880,7 +1880,7 @@ ppdcSource::get_simple_profile(ppdcFile *fp)
   }
 
   // Return the new profile...
-  return (new ppdcProfile(resolution, media_type, g, kd, m));
+  return (new ppdcProfile(resolution, media_type, kd, g, m));
 }
 
 

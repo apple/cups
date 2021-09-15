@@ -229,7 +229,6 @@ main(int  argc,				// I - Number of command-line arguments
 
 	  default :			// Unknown
 	      usage();
-	      break;
 	}
     }
     else
@@ -393,7 +392,7 @@ main(int  argc,				// I - Number of command-line arguments
 	return (1);
       }
 
-      if (templocales != locales)
+      if (templocales && templocales != locales)
         templocales->release();
 
       cupsFileClose(fp);
