@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="/css/cups.css">
-    <link rel="shortcut icon" href="/apple-touch-icon.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="{{ 'css/cups.css' | relative_url }}">
+    <link rel="shortcut icon" href="{{ 'apple-touch-icon.png' | relative_url }}" type="image/png">
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=9">
@@ -12,96 +13,44 @@
     <meta name="keywords" content="printing,printer driver,internet printing protocol,ipp,ipp everywhere,ppd,linux,unix,mac,os x,postscript,pdf,text,image">
   </head>
   <body>
-    <nav class="navbar navbar-expand-sm navbar-dark cups-nav fixed-top" role="navigation">
-      <a class="navbar-brand" href="/index.html">CUPS.org</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#cups-collapsible" aria-controls="cups-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="cups-collapsible">
-	<ul class="navbar-nav">
-	  <li class="nav-item dropdown">
-	    <a class="nav-link dropdown-toggle" href="#" id="cups-blog-dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Blog</a>
-	    <div class="dropdown-menu cups-nav" aria-labelledby="cups-blog-dropdown">
-  {% for post in site.posts offset: 0 limit: 10 %}
-	      <a class="dropdown-item cups-nav" href="{{ post.url }}">{{post.title}}</a>
-  {% endfor %}
-	      <div class="dropdown-divider cups-nav"></div>
-	      <a class="dropdown-item cups-nav" href="/blog.html">All Articles</a>
-	    </div>
-	  </li>
-	  <li class="nav-item dropdown">
-	    <a class="nav-link dropdown-toggle" href="#" id="cups-bugs-dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Bugs</a>
-	    <div class="dropdown-menu cups-nav" aria-labelledby="cups-bugs-dropdown">
-	      <a class="dropdown-item cups-nav" href="/doc/reporting-bugs.html">Reporting Bugs</a>
-	      <a class="dropdown-item cups-nav" href="{{site.github.issues_url}}">All Issues</a>
-	      <div class="dropdown-divider cups-nav"></div>
-	      <a class="dropdown-item cups-nav" href="{{site.github.repository_url}}/milestone/4">CUPS 2.3.x Issues</a>
-	      <a class="dropdown-item cups-nav" href="{{site.github.repository_url}}/milestone/2">CUPS Future Issues</a>
-	    </div>
-	  </li>
-	  <li class="nav-item">
-	    <a class="nav-link" href="/documentation.html">Help</a>
-	  </li>
-	  <li class="nav-item dropdown">
-	    <a class="nav-link dropdown-toggle" href="#" id="cups-lists-dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Lists</a>
-	    <div class="dropdown-menu cups-nav" aria-labelledby="cups-lists-dropdown">
-	      <a class="dropdown-item cups-nav" href="https://lists.cups.org/mailman/listinfo/cups">User</a>
-	      <a class="dropdown-item cups-nav" href="https://lists.cups.org/mailman/listinfo/cups-devel">Developer</a>
-	    </div>
-	  </li>
-	  <li class="nav-item">
-	    <a class="nav-link" href="/software.html">Software</a>
-	  </li>
-	  <li class="nav-item">
-	    <a class="nav-link" href="#modalSearch" data-toggle="modal" data-target="#modalSearch">Search</a>
-	  </li>
-	</ul>
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark" role="navigation">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{{ 'index.html' | relative_url }}">CUPS.org</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#cups-collapsible" aria-controls="cups-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="cups-collapsible">
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="{{site.github.repository_url}}/releases"><i class="bi bi-download"></i> Download</a></li>
+            <li class="nav-item"><a class="nav-link" href="/documentation.html"><i class="bi bi-book"></i> Help</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{site.github.repository_url}}/issues"><i class="bi bi-bug-fill"></i> Issues</a></li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="cups-lists-dropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-inboxes"></i> Lists</a>
+              <div class="dropdown-menu cups-nav" aria-labelledby="cups-lists-dropdown">
+                <a class="dropdown-item cups-nav" href="https://lists.cups.org/mailman/listinfo/cups"><i class="bi bi-inbox"></i> User</a>
+                <a class="dropdown-item cups-nav" href="https://lists.cups.org/mailman/listinfo/cups-devel"><i class="bi bi-inbox"></i> Developer</a>
+              </div>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="{{ 'blog.html' | relative_url }}"><i class="bi bi-newspaper"></i> News</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{site.github.repository_url}}"><i class="bi bi-github"></i> Repository</a></li>
+          </ul>
+          <form action="https://duckduckgo.com/" method="get" class="d-flex ms-auto me-0">
+            <input type="hidden" name="sites" value="www.cups.org">
+            <input class="form-control" style="width: 80%;" type="search" name="q" placeholder="Search" aria-label="Search"><button class="btn btn-primary mr-0" type="submit"><i class="bi bi-search"></i></button>
+          </form>
+        </div>
       </div>
     </nav>
-    <!-- Search Modal -->
-    <div id="modalSearch" class="modal fade" role="dialog">
-      <div class="modal-dialog" role="document">
-	<!-- Modal content-->
-	<div class="modal-content">
-	   <div class="modal-header">
-	     <h4 class="modal-title">Search CUPS.org</h4>
-	     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	       <span aria-hidden="true">&times;</span>
-	     </button>
-	   </div>
-	   <div class="modal-body">
-	     <script>
-	       (function() {
-		 var cx = '013583990091537888036:obh2r5tsaso';
-		 var gcse = document.createElement('script');
-		 gcse.type = 'text/javascript';
-		 gcse.async = true;
-		 gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
-		 var s = document.getElementsByTagName('script')[0];
-		 s.parentNode.insertBefore(gcse, s);
-	       })();
-	     </script>
-	     <gcse:search></gcse:search>
-	   </div>
-	   <div class="modal-footer">
-	     <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-	   </div>
-	</div>
-      </div>
-    </div>
     <!-- Page Content -->
-    <div class="container-fluid container-top">
+    <div class="container-fluid pb-4">
       <div class="jumbotron">
         <h1>{{page.title}}</h1>
       </div>
       {{ content }}
     </div>
-    <div class="footer">
-      <p>Copyright &copy; 2007-{{ site.time | date: "%Y" }} Apple Inc. CUPS 2.2 and earlier are provided under the terms of the <a href="doc/old-license.html">GNU GPL2 and LGPL2 with exceptions</a> while CUPS 2.3 and later are provided under the terms of the <a href="/doc/license.html">Apache License, Version 2.0</a>. CUPS, the CUPS logo, and macOS are trademarks of <a href="http://www.apple.com/legal/intellectual-property/trademark/appletmlist.html">Apple Inc.</a> All other trademarks are the property of their respective owners. <a href="https://www.apple.com/legal/privacy/en-ww/" target="_blank">Apple Privacy Policy</a></p>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <nav class="navbar navbar-expand navbar-dark bg-dark justify-content-center p-2">
+      <span class="navbar-text">Copyright &copy; 2007-{{ site.time | date: "%Y" }} Apple Inc. CUPS 2.2 and earlier are provided under the terms of the <a href="doc/old-license.html">GNU GPL2 and LGPL2 with exceptions</a> while CUPS 2.3 and later are provided under the terms of the <a href="/doc/license.html">Apache License, Version 2.0</a>. CUPS, the CUPS logo, and macOS are trademarks of <a href="http://www.apple.com/legal/intellectual-property/trademark/appletmlist.html">Apple Inc.</a> All other trademarks are the property of their respective owners. <a href="https://www.apple.com/legal/privacy/en-ww/" target="_blank">Apple Privacy Policy</a></span>
+    </nav>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
   </body>
 </html>

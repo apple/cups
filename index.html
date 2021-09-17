@@ -4,21 +4,21 @@ layout: default
 ---
 
 <div class="jumbotron">
-  <h1>CUPS</h1>
-  <p>CUPS is the standards-based, open source printing system developed by <a class="jumbolink" href="http://www.apple.com/">Apple Inc.</a> for macOS<sup>&reg;</sup> and other UNIX<sup>&reg;</sup>-like operating systems. CUPS uses the Internet Printing Protocol (IPP) to support printing to local and network printers.</p>
+  <h1>Apple CUPS</h1>
+  <p>The standards-based, open source printing system developed by Apple for iOS<sup>&reg;</sup>, iPadOS<sup>&reg;</sup>, and macOS<sup>&reg;</sup>. CUPS uses <a class="jumbolink" href="https://www.pwg.org/ipp/everywhere.html" target="_blank">IPP Everywhere™</a> to support printing to local and network printers.</p>
   <p class="cups-buttons">
-    <a class="btn btn-primary btn-large" href="{{site.github.repository_url}}/releases">Download CUPS</a>
-    <a class="btn btn-bright btn-large" href="{{site.github.repository_url}}">Github Repository</a>
-    <a class="btn btn-bright btn-large" href="doc/license.html">License</a>
-    <a class="btn btn-bright btn-large" href="doc/reporting-bugs.html">Reporting Bugs</a>
-    <a class="btn btn-bright btn-large" href="faq.html">Frequently Asked Questions</a>
+    <a class="btn btn-primary btn-large" href="{{site.github.repository_url}}/releases"><i class="bi bi-download"></i> Download</a>
+    <a class="btn btn-bright btn-large" href="{{site.github.repository_url}}"><i class="bi bi-github"></i> Repository</a>
   </p>
+  <p><a class="jumbolink" href="https://openprinting.github.io/cups">Get CUPS for Other Operating Systems</a></p>
 </div>
 
-{% for post in site.posts offset: 0 limit: 8 %}
+{% for post in site.posts offset: 0 limit: 4 %}
 <h2><small class="float-right muted">{{ post.date | date_to_string }}</small>{{post.title}}</h2>
 {{ post.excerpt }}
 {% if post.excerpt != post.content %}
 <p><a class="btn btn-default btn-xs" href=".{{ post.url }}">Read</a></p>
 {% endif %}
 {% endfor %}
+
+<p><a class="btn btn-default btn-xs" href="{{ 'blog.html' | relative_url }}"><i class="bi bi-newspaper"></i> News</a></p>

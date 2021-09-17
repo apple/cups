@@ -9,54 +9,6 @@ layout: default
 
 <h2>Source Releases</h2>
 
-<p><a class="btn btn-primary btn-large" href="{{site.github.releases_url}}"><span class="glyphicon glyphicon-download-alt"></span> Download CUPS</a></p>
+<p><a class="btn btn-primary btn-large" href="{{site.github.releases_url}}"><i class="bi bi-download"></i> Download CUPS</a></p>
 
 <p>See the <a href="pgp.html">PGP Information</a> page for information on validating source releases.</p>
-
-<h2>Binary Releases</h2>
-
-<p>Free binaries are available elsewhere - search <a target="_blank" href="http://www.google.com/search?q=cups+binary+package&amp;btnG=Search">Google</a> to find them.</p>
-
-<blockquote><b>Note:</b>
-
-<p>We do not provide binaries for macOS since newer releases of CUPS are not generally compatible with prior releases of macOS, and System Integrity Protection (enabled by default) will prevent replacement of the CUPS software.</p>
-
-</blockquote>
-
-
-<h2>Building RPMs</h2>
-
-<p>The source distributions include an RPM spec file that can be used to build RPM packages for your Linux distribution. The <tt>rpmbuild</tt> command is used to build from the tar files:</p>
-
-<pre class="command">
-rpmbuild -ta cups-<i>version</i>-source.tar.gz
-</pre>
-
-<p>At a minimum, you'll need the <tt>gcc</tt>, <tt>pam-devel</tt>, and <tt>zlib-devel</tt> packages installed to compile CUPS with all of the standard functionality. Additional developer packages are needed for Bonjour (Avahi), DBUS, systemd, and USB printing support.</p>
-
-<p>The spec file supports five options:</p>
-
-<ul>
-
-	<li><tt>--without dnssd</tt>: Build without Bonjour support (via Avahi)</li>
-	<li><tt>--without dbus</tt>: Build without DBUS support</li>
-	<li><tt>--without libusb1</tt>: Build without USB MFP support (via libusb 1.x)</li>
-	<li><tt>--with static</tt>: Build with static libraries</li>
-	<li><tt>--without systemd</tt>: Build without systemd support</li>
-
-</ul>
-
-<p>For example, if you are compiling CUPS on Red Hat Enterprise Linux 6, you will need to provide the <tt>--without systemd</tt> option since that distribution does not use systemd:</p>
-
-<pre class="command">
-rpmbuild -ta cups-<i>version</i>-source.tar.gz --without systemd
-</pre>
-
-
-<h2>Repository Access</a></h2>
-
-<p>The CUPS repository is hosted on Github. Run the following command to checkout the current 2.3.x (stable) version of the CUPS code:</p>
-
-<pre class="command">
-git clone {{site.github.clone_url}} cups-2.3
-</pre>

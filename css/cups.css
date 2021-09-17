@@ -34,15 +34,6 @@ NAV A:link, NAV A:link:visited, NAV A:visited {
   text-decoration: none;
 }
 
-NAV.cups-nav {
-  background: #111;
-  box-shadow: 0px 0px 3px rgba(0,0,0,0.8);
-}
-
-NAV.cups-nav a.navbar-brand {
-  background: none;
-}
-
 NAV a.navbar-brand:link, NAV a.navbar-brand:visited {
   color: #ccc;
 }
@@ -53,11 +44,6 @@ NAV a.navbar-brand:hover, NAV a.navbar-brand:active {
 
 .dropdown-divider {
   border-top-color: #888;
-}
-
-.cups-nav {
-  background: #222;
-  color: #ccc;
 }
 
 A.btn:link, A.btn:hover, A.btn:visited, A.btn:focus,
@@ -143,7 +129,7 @@ INPUT[type="checkbox"] {
 }
 
 DIV.jumbotron {
-  background: #222;
+  background: #444;
   border-radius: 0;
   color: white;
   margin: -3px -20px 20px;
@@ -152,6 +138,14 @@ DIV.jumbotron {
 
 A.jumbolink:link, A.jumbolink:hover, A.jumbolink:focus, A.jumbolink:visited {
   color: #3C92FF;
+}
+
+A.jumbolink:link, A.jumbolink:visited {
+  text-decoration: none;
+}
+
+A.jumbolink:focus, A.jumbolink:hover {
+  text-decoration: underline;
 }
 
 DIV.jumbotron H1 {
@@ -172,23 +166,6 @@ H2 {
  margin-top: 1em;
 }
 
-DIV.footer {
-  background-color: #111;
-  bottom: 0px;
-  box-shadow: 0px 0px 3px rgba(0,0,0,0.8);
-  color: #ccc;
-  font-size: 11px;
-  left: 0px;
-  line-height: 14px;
-  padding: 10px 10px 0px; /* top right+left bottom */
-  position: fixed;
-  right: 0px;
-}
-
-DIV.footer A, DIV.footer A:hover, DIV.footer A:focus, DIV.footer A:visited {
-  color: #3C92FF;
-}
-
 P {
   margin-bottom: 20px;
 }
@@ -198,14 +175,6 @@ PRE {
   border-left: 5px solid #ddd;
   border-radius: 0px;
   padding-left: 10px;
-}
-
-DIV.footer P {
-  margin-bottom: 10px;
-}
-
-DIV.container-top {
-  padding: 55px 20px; /* top+bottom right+left */
 }
 
 .form-control {
@@ -399,9 +368,6 @@ div.body dd {
   DIV.table TABLE TH {
     background: #333;
   }
-  DIV.footer {
-    background: #222;
-  }
 }
 
 /* iPhone/iPod touch overrides */
@@ -429,11 +395,6 @@ div.body dd {
     font-size: 20px;
     line-height: 20px;
   }
-  DIV.footer {
-    height: auto;
-    padding: 10px 10px 5px; /* top right+left bottom */
-    position: relative;
-  }
 }
 
 /* iPad overrides */
@@ -442,19 +403,6 @@ div.body dd {
 
 /* Print overrides */
 @media print {
-/*  DIV.navbar, DIV.container-top UL.breadcrumb {
-    display: none;
-  }*/
-
-  DIV.container-top {
-    padding: 0px;
-  }
-
-  DIV.footer {
-    font-style: italic;
-    position: relative;
-  }
-
   .hidden-print {
     display: none;
   }
