@@ -46,7 +46,7 @@ static char		*rss_password;	/* Password for remote RSS */
  */
 
 static int		compare_rss(_cups_rss_t *a, _cups_rss_t *b);
-static void		delete_message(_cups_rss_t *rss);
+static void		delete_message(_cups_rss_t *msg);
 static void		load_rss(cups_array_t *rss, const char *filename);
 static _cups_rss_t	*new_message(int sequence_number, char *subject,
 			             char *text, char *link_url,
