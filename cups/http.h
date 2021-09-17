@@ -346,7 +346,7 @@ typedef enum http_trust_e		/**** Level of trust for credentials @since CUPS 2.0/
   HTTP_TRUST_CHANGED,			/* Credentials have changed */
   HTTP_TRUST_EXPIRED,			/* Credentials are expired */
   HTTP_TRUST_RENEWED,			/* Credentials have been renewed */
-  HTTP_TRUST_UNKNOWN,			/* Credentials are unknown/new */
+  HTTP_TRUST_UNKNOWN			/* Credentials are unknown/new */
 } http_trust_t;
 
 typedef enum http_uri_status_e		/**** URI separation status @since CUPS 1.2@ ****/
