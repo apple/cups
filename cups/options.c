@@ -495,36 +495,30 @@ cupsRemoveOption(
   * Range check input...
   */
 
-  if (!name || num_options < 1 || !options)
-  {
-    DEBUG_printf(("3cupsRemoveOption: Returning %d", num_options));
-    return (num_options);
-  }
-
- /*
-  * Loop for the option...
-  */
-
-  for (i = num_options, option = *options; i > 0; i --, option ++)
-    if (!_cups_strcasecmp(name, option->name))
-      break;
-
-  if (i)
+  if (name && num_options > 0 && options)
   {
    /*
-    * Remove this option from the array...
+    * Loop for the option...
     */
 
-    DEBUG_puts("4cupsRemoveOption: Found option, removing it...");
+    for (i = num_options, option = *options; i > 0; i--, option++)
+      if (!_cups_strcasecmp(name, option->name))
+      {
+       /*
+        * Remove this option from the array...
+        */
 
-    num_options --;
-    i --;
+        DEBUG_puts("4cupsRemoveOption: Found option, removing it...");
 
-    _cupsStrFree(option->name);
-    _cupsStrFree(option->value);
+        _cupsStrFree(option->name);
+        _cupsStrFree(option->value);
 
-    if (i > 0)
-      memmove(option, option + 1, (size_t)i * sizeof(cups_option_t));
+        if (i > 1)
+          memmove(option, option + 1, (size_t)(i - 1) * sizeof(cups_option_t));
+
+        num_options --;
+        break;
+      }
   }
 
  /*
@@ -558,10 +552,12 @@ _cupsGet1284Values(
   * Range check input...
   */
 
-  if (values)
-    *values = NULL;
+  if (!values)
+    return (0);
 
-  if (!device_id || !values)
+  *values = NULL;
+
+  if (!device_id)
     return (0);
 
  /*
@@ -584,17 +580,16 @@ _cupsGet1284Values(
       if (ptr < (key + sizeof(key) - 1))
         *ptr++ = *device_id;
 
-    if (!*device_id)
-      break;
-
     while (ptr > key && _cups_isspace(ptr[-1]))
       ptr --;
 
     *ptr = '\0';
-    device_id ++;
 
-    while (_cups_isspace(*device_id))
-      device_id ++;
+    do
+    {
+      device_id++;
+    }
+    while (_cups_isspace(*device_id));
 
     if (!*device_id)
       break;
@@ -603,16 +598,15 @@ _cupsGet1284Values(
       if (ptr < (value + sizeof(value) - 1))
         *ptr++ = *device_id;
 
-    if (!*device_id)
-      break;
-
     while (ptr > value && _cups_isspace(ptr[-1]))
       ptr --;
 
     *ptr = '\0';
-    device_id ++;
-
     num_values = cupsAddOption(key, value, num_values, values);
+
+    if (!*device_id)
+      break;
+    device_id ++;
   }
 
   return (num_values);
