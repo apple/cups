@@ -584,17 +584,16 @@ _cupsGet1284Values(
       if (ptr < (key + sizeof(key) - 1))
         *ptr++ = *device_id;
 
-    if (!*device_id)
-      break;
-
     while (ptr > key && _cups_isspace(ptr[-1]))
       ptr --;
 
     *ptr = '\0';
-    device_id ++;
 
-    while (_cups_isspace(*device_id))
-      device_id ++;
+    do
+    {
+      device_id++;
+    }
+    while (_cups_isspace(*device_id));
 
     if (!*device_id)
       break;
@@ -608,7 +607,7 @@ _cupsGet1284Values(
 
     *ptr = '\0';
     num_values = cupsAddOption(key, value, num_values, values);
-	  
+
     if (!*device_id)
       break;
     device_id ++;
