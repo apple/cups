@@ -9372,11 +9372,10 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
     cupsdLogJob(job, CUPSD_LOG_DEBUG,
 		"Restarted by \"%s\" with job-hold-until=%s.",
                 username, attr->values[0].string.text);
-    cupsdSetJobHoldUntil(job, attr->values[0].string.text, 0);
-
-    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED | CUPSD_EVENT_JOB_STATE,
-                  NULL, job, "Job restarted by user with job-hold-until=%s",
-		  attr->values[0].string.text);
+    cupsdSetJobHoldUntil(job, attr->values[0].string.text, 1);
+    cupsdSetJobState(job, IPP_JOB_HELD, CUPSD_JOB_DEFAULT,
+                     "Job restarted by user with job-hold-until=%s",
+                     attr->values[0].string.text);
   }
   else
   {
