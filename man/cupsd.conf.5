@@ -1,13 +1,13 @@
 .\"
 .\" cupsd.conf man page for CUPS.
 .\"
-.\" Copyright © 2007-2019 by Apple Inc.
+.\" Copyright © 2007-2021 by Apple Inc.
 .\" Copyright © 1997-2006 by Easy Software Products.
 .\"
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH cupsd.conf 5 "CUPS" "16 July 2019" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "1 October 2021" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -240,13 +240,6 @@ The default is "0" which disables the limit check.
 Listens to the specified address and port or domain socket path for connections.
 Multiple Listen directives can be provided to listen on multiple addresses.
 The Listen directive is similar to the Port directive but allows you to restrict access to specific interfaces or networks.
-.\"#ListenBackLog
-.TP 5
-\fBListenBackLog \fInumber\fR
-Specifies the number of pending connections that will be allowed.
-This normally only affects very busy servers that have reached the MaxClients limit, but can also be triggered by large numbers of simultaneous connections.
-When the limit is reached, the operating system will refuse additional connections until the scheduler can accept the pending ones.
-The default is the OS-defined default limit, typically either "5" for older operating systems or "128" for newer operating systems.
 .\"#Location
 .TP 5
 \fB<Location \fI/path\fB> \fR... \fB</Location>\fR
@@ -824,6 +817,11 @@ The default is no classification banner.
 .br
 Specifies whether users may override the classification (cover page) of individual print jobs using the "job-sheets" option.
 The default is "No".
+.\"#ListenBackLog
+.TP 5
+\fBListenBackLog \fInumber\fR
+Specified the number of pending connections that will be allowed.
+The scheduler now uses the value "128" on all platforms.
 .\"#PageLogFormat
 .TP 5
 \fBPageLogFormat \fIformat-string\fR
@@ -897,4 +895,4 @@ Require authentication for accesses from outside the 10. network:
 .BR subscriptions.conf (5),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2019 by Apple Inc.
+Copyright \[co] 2007-2021 by Apple Inc.
