@@ -195,8 +195,7 @@ static int		cupsd_in_select = 0;
 #endif /* HAVE_EPOLL || HAVE_KQUEUE */
 
 #ifdef HAVE_KQUEUE
-static int		cupsd_kqueue_fd = -1,
-			cupsd_kqueue_changes = 0;
+static int		cupsd_kqueue_fd = -1;
 static struct kevent	*cupsd_kqueue_events = NULL;
 #elif defined(HAVE_POLL)
 static int		cupsd_alloc_pollfds = 0,
@@ -418,8 +417,6 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   }
   else
     nfds = kevent(cupsd_kqueue_fd, NULL, 0, cupsd_kqueue_events, MaxFDs, NULL);
-
-  cupsd_kqueue_changes = 0;
 
   for (i = nfds, event = cupsd_kqueue_events; i > 0; i --, event ++)
   {
@@ -805,7 +802,6 @@ cupsdStartSelect(void)
 
 #elif defined(HAVE_KQUEUE)
   cupsd_kqueue_fd      = kqueue();
-  cupsd_kqueue_changes = 0;
   cupsd_kqueue_events  = calloc((size_t)MaxFDs, sizeof(struct kevent));
 
 #elif defined(HAVE_POLL)
@@ -855,8 +851,6 @@ cupsdStopSelect(void)
     close(cupsd_kqueue_fd);
     cupsd_kqueue_fd = -1;
   }
-
-  cupsd_kqueue_changes = 0;
 
 #elif defined(HAVE_POLL)
 #  ifdef HAVE_EPOLL
