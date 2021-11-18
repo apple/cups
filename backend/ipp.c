@@ -3285,7 +3285,7 @@ run_as_user(char       *argv[],		/* I - Command-line arguments */
 				         fprintf(stderr, "DEBUG: Connection invalid for service %s.\n",
 					         xpc_connection_get_name(conn));
 				       else
-				         fprintf(stderr, "DEBUG: Unxpected error for service %s: %s\n",
+				         fprintf(stderr, "DEBUG: Unexpected error for service %s: %s\n",
 					         xpc_connection_get_name(conn),
 						 xpc_dictionary_get_string(event, XPC_ERROR_KEY_DESCRIPTION));
 				     }

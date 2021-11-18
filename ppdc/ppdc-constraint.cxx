@@ -1,5 +1,5 @@
 //
-// Contraint class for the CUPS PPD Compiler.
+// Constraint class for the CUPS PPD Compiler.
 //
 // Copyright 2007-2009 by Apple Inc.
 // Copyright 2002-2005 by Easy Software Products.

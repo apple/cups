@@ -258,9 +258,9 @@ static CFStringRef	ComputerNameKey = NULL,
 			HostNamesKey = NULL,
 					/* Host name key */
 			NetworkInterfaceKeyIPv4 = NULL,
-					/* Netowrk interface key */
+					/* Network interface key */
 			NetworkInterfaceKeyIPv6 = NULL;
-					/* Netowrk interface key */
+					/* Network interface key */
 static cupsd_sysevent_t	LastSysEvent;	/* Last system event (for delayed sleep) */
 static int		NameChanged = 0;/* Did we get a 'name changed' event during sleep? */
 static int		PSToken = 0;	/* Power source notifications */

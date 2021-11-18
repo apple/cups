@@ -3379,7 +3379,7 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
     if (*lineptr == ':')
     {
      /*
-      * Get string after triming leading and trailing whitespace...
+      * Get string after trimming leading and trailing whitespace...
       */
 
       lineptr ++;

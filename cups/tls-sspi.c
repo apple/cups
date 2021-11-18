@@ -1755,7 +1755,7 @@ http_sspi_find_credentials(
   }
 
  /*
-  * Set supported protocols (can also be overriden in the registry...)
+  * Set supported protocols (can also be overridden in the registry...)
   */
 
 #ifdef SP_PROT_TLS1_2_SERVER

@@ -1055,7 +1055,7 @@ DNSServiceErrorType DNSSD_API DNSServiceRegister
  *
  * sdRef:           A DNSServiceRef initialized by DNSServiceRegister().
  *
- * RecordRef:       A pointer to an uninitialized DNSRecordRef. Upon succesfull completion of this
+ * RecordRef:       A pointer to an uninitialized DNSRecordRef. Upon successful completion of this
  *                  call, this ref may be passed to DNSServiceUpdateRecord() or DNSServiceRemoveRecord().
  *                  If the above DNSServiceRef is passed to DNSServiceRefDeallocate(), RecordRef is also
  *                  invalidated and may not be used further.
@@ -1684,7 +1684,7 @@ DNSServiceErrorType DNSSD_API DNSServiceCreateConnection(DNSServiceRef *sdRef);
  *
  * sdRef:           A DNSServiceRef initialized by DNSServiceCreateConnection().
  *
- * RecordRef:       A pointer to an uninitialized DNSRecordRef. Upon succesfull completion of this
+ * RecordRef:       A pointer to an uninitialized DNSRecordRef. Upon successful completion of this
  *                  call, this ref may be passed to DNSServiceUpdateRecord() or DNSServiceRemoveRecord().
  *                  (To deregister ALL records registered on a single connected DNSServiceRef
  *                  and deallocate each of their corresponding DNSServiceRecordRefs, call
@@ -2419,7 +2419,7 @@ DNSServiceErrorType DNSSD_API DNSServiceSetDispatchQueue
  * and report errors at compile-time if anything is wrong. The usual way to do this would
  * be to use a run-time "if" statement or the conventional run-time "assert" mechanism, but
  * then you don't find out what's wrong until you run the software. This way, if the assertion
- * condition is false, the array size is negative, and the complier complains immediately.
+ * condition is false, the array size is negative, and the compiler complains immediately.
  */
 
 struct CompileTimeAssertionChecks_DNS_SD

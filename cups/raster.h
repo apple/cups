@@ -335,7 +335,7 @@ typedef struct cups_page_header2_s	/**** Version 2 page header @since CUPS 1.2/m
   unsigned	cupsRowStep;		/* Spacing between lines */
 
   /**** Version 2 Dictionary Values ****/
-  unsigned	cupsNumColors;		/* Number of color compoents @since CUPS 1.2/macOS 10.5@ */
+  unsigned	cupsNumColors;		/* Number of color components @since CUPS 1.2/macOS 10.5@ */
   float		cupsBorderlessScalingFactor;
 					/* Scaling that was applied to page data @since CUPS 1.2/macOS 10.5@ */
   float		cupsPageSize[2];	/* Floating point PageSize (scaling *

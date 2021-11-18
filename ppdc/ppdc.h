@@ -467,7 +467,7 @@ class ppdcSource			//// Source File
 		*po_files,		// Message catalogs
 		*sizes,			// Predefined media sizes
 		*vars;			// Defined variables
-  int		cond_state,		// Cummulative conditional state
+  int		cond_state,		// Cumulative conditional state
 		*cond_current,		// Current #if state
 		cond_stack[101];	// #if state stack
 

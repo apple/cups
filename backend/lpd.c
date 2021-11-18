@@ -61,7 +61,7 @@ static int	abort_job = 0;		/* Non-zero if we get SIGTERM */
  * What to reserve...
  */
 
-#define RESERVE_NONE		0	/* Don't reserve a priviledged port */
+#define RESERVE_NONE		0	/* Don't reserve a privileged port */
 #define RESERVE_RFC1179		1	/* Reserve port 721-731 */
 #define RESERVE_ANY		2	/* Reserve port 1-1023 */
 
@@ -114,7 +114,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int		banner;			/* Print banner page? */
   int		format;			/* Print format */
   int		order;			/* Order of control/data files */
-  int		reserve;		/* Reserve priviledged port? */
+  int		reserve;		/* Reserve privileged port? */
   int		sanitize_title;		/* Sanitize title string? */
   int		manual_copies,		/* Do manual copies? */
 		timeout,		/* Timeout */
@@ -768,7 +768,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
         return (CUPS_BACKEND_FAILED);
 
      /*
-      * Choose the next priviledged port...
+      * Choose the next privileged port...
       */
 
       if (!addr)
@@ -805,7 +805,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
       {
        /*
 	* We're running as root and want to comply with RFC 1179.  Reserve a
-	* priviledged lport between 721 and 731...
+	* privileged lport between 721 and 731...
 	*/
 
 	if ((fd = cups_rresvport(&lport, addr->addr.addr.sa_family)) < 0)

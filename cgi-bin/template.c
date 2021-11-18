@@ -432,7 +432,7 @@ cgi_copy(FILE *out,			/* I - Output file */
       if (ch == '?')
       {
        /*
-        * Test for existance...
+        * Test for existence...
 	*/
 
         if (name[0] == '?')

@@ -503,7 +503,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (do_side_tests)
   {
     int			length;		/* Length of buffer */
-    char		buffer[2049];	/* Buffer for reponse */
+    char		buffer[2049];	/* Buffer for response */
     cups_sc_status_t	scstatus;	/* Status of side-channel command */
     static const char * const statuses[] =
     {

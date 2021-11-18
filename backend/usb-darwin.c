@@ -955,7 +955,7 @@ static void *read_thread(void *reference)
       fputs("DEBUG: Got USB return aborted during read\n", stderr);
 
    /*
-    * Make sure this loop executes no more than once every 250 miliseconds...
+    * Make sure this loop executes no more than once every 250 milliseconds...
     */
 
     if ((readstatus != kIOReturnSuccess || rbytes == 0) && (g.wait_eof || !g.read_thread_stop))
@@ -978,7 +978,7 @@ static void *read_thread(void *reference)
          if (readstatus == kIOReturnSuccess && rbytes > 0 && readbuffer[rbytes-1] == 0x4)
            break;
 
-         /* Make sure this loop executes no more than once every 250 miliseconds... */
+         /* Make sure this loop executes no more than once every 250 milliseconds... */
          mach_wait_until(start + delay);
        }
      }
@@ -2347,7 +2347,7 @@ static void parse_pserror(char *sockBuffer,
 
       if ((logstrlen = snprintf(logstr, sizeof(logstr), "%s: %s\n", logLevel, pCommentBegin)) >= sizeof(logstr))
       {
-	/* If the string was trucnated make sure it has a linefeed before the nul */
+	/* If the string was truncated make sure it has a linefeed before the nul */
 	logstrlen = sizeof(logstr) - 1;
 	logstr[logstrlen - 1] = '\n';
       }

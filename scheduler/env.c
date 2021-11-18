@@ -100,7 +100,7 @@ void
 cupsdSetEnv(const char *name,		/* I - Name of variable */
             const char *value)		/* I - Value of variable */
 {
-  int	i;				/* Index into environent array */
+  int	i;				/* Index into environment array */
 
 
  /*

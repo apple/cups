@@ -120,7 +120,7 @@ cupsdStartListening(void)
 {
   int			p;		/* Port number */
   cupsd_listener_t	*lis;		/* Current listening socket */
-  char			s[256];		/* String addresss */
+  char			s[256];		/* String address */
   const char		*have_domain;	/* Have a domain socket? */
   static const char * const encryptions[] =
 		{			/* Encryption values */
