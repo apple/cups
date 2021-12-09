@@ -9,7 +9,7 @@ Apple Contributor Agreement:
     https://www.cups.org/AppleContributorAgreement_2011-03-10.pdf
 
 Contributions should be submitted as attachments to bug reports on the
-[CUPS Github project](https://github.com/apple/cups).  Changes to existing
+[CUPS GitHub project](https://github.com/apple/cups).  Changes to existing
 source files should be submitted as unified diffs while new source files
 should be provided as-is or in an archive.  Github pull requests can also be
 used to submit changes.
