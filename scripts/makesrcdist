@@ -59,7 +59,7 @@ else
 		exit 1
 	fi
 
-	temp=`head -1 README.md | awk '{print $4}'`
+	temp=`head -1 README.md | awk '{print $5}'`
 	if test "$temp" != "v$version"; then
 		echo "Still need to update version to v$version in README.md (saw $temp)"
 		exit 1

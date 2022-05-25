@@ -1,7 +1,7 @@
 /*
  * API definitions for CUPS.
  *
- * Copyright © 2007-2021 by Apple Inc.
+ * Copyright © 2007-2022 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -42,10 +42,10 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION			2.0305
+#  define CUPS_VERSION			2.0306
 #  define CUPS_VERSION_MAJOR		2
 #  define CUPS_VERSION_MINOR		3
-#  define CUPS_VERSION_PATCH		5
+#  define CUPS_VERSION_PATCH		6
 
 #  define CUPS_BC_FD			3
 					/* Back-channel file descriptor for

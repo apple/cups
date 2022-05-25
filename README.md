@@ -1,4 +1,4 @@
-README - Apple CUPS v2.3.5 - 2021-09-13
+README - Apple CUPS v2.3.6 - 2022-05-25
 =======================================
 
 > Note: Apple CUPS is the version of CUPS that is shipped with macOS and iOS.

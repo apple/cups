@@ -1,6 +1,10 @@
 Change History
 ==============
 
+Changes in CUPS v2.3.6
+----------------------
+- CVE-2022-26691: An incorrect comparison in local admin authentication.
+
 
 Changes in CUPS v2.3.5
 ----------------------
