@@ -434,5 +434,9 @@ ctcompare(const char *a,		/* I - First string */
     b ++;
   }
 
+  // either both *a and *b == '\0', or one points inside a string,
+  // so factor that in.
+  result |= (*a ^ *b);
+
   return (result);
 }
