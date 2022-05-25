@@ -169,7 +169,7 @@ if test -n "$GCC"; then
 	fi
 
 	# Add useful warning options for tracking down problems...
-	WARNING_OPTIONS="-Wall -Wno-format-y2k -Wunused -Wno-unused-result -Wsign-conversion"
+	WARNING_OPTIONS="-Wall -Wno-format-y2k -Wunused -Wno-unused-result -Wsign-conversion  -Wno-unused-but-set-variable  -Wno-unused-variable"
 
 	# Test GCC version for certain warning flags since -Werror
 	# doesn't trigger...
@@ -182,7 +182,7 @@ if test -n "$GCC"; then
 
 	# Additional warning options for development testing...
 	if test -d .git; then
-		WARNING_OPTIONS="-Werror -Wno-error=deprecated-declarations $WARNING_OPTIONS"
+		WARNING_OPTIONS="-Werror -Wno-error=deprecated-declarations -Wno-unknown-warning-option $WARNING_OPTIONS"
 	fi
 else
 	# Add vendor-specific compiler options...
