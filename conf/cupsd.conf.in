@@ -29,6 +29,8 @@ WebInterface @CUPS_WEBIF@
 
 # Restrict access to the admin pages...
 <Location /admin>
+  AuthType Default
+  Require user @SYSTEM
   Order allow,deny
 </Location>
 
