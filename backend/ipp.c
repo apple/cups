@@ -2830,8 +2830,6 @@ new_request(
         static const char * const allowed = "0123456789#*-+.()pw";
 					/* Allowed characters */
 
-        destination = ippNew();
-
        /*
         * Unescape and filter out spaces and other characters that are not
         * allowed in a tel: URI.
@@ -2864,6 +2862,8 @@ new_request(
 
         if (strlen(phone) > 0)
         {
+          destination = ippNew();
+
           httpAssembleURI(HTTP_URI_CODING_ALL, tel_uri, sizeof(tel_uri), "tel", NULL, NULL, 0, phone);
           ippAddString(destination, IPP_TAG_JOB, IPP_TAG_URI, "destination-uri", NULL, tel_uri);
           fprintf(stderr, "DEBUG: Faxing to phone %s; destination-uri: %s\n", phone, tel_uri);
@@ -3250,7 +3250,6 @@ run_as_user(char       *argv[],		/* I - Command-line arguments */
   xpc_connection_t	conn;		/* Connection to XPC service */
   xpc_object_t		request;	/* Request message dictionary */
   __block xpc_object_t	response;	/* Response message dictionary */
-  dispatch_semaphore_t	sem;		/* Semaphore for waiting for response */
   int			status = CUPS_BACKEND_FAILED;
 					/* Status of request */
 
@@ -3317,24 +3316,9 @@ run_as_user(char       *argv[],		/* I - Command-line arguments */
   xpc_dictionary_set_fd(request, "stderr", 2);
   xpc_dictionary_set_fd(request, "side-channel", CUPS_SC_FD);
 
-  sem      = dispatch_semaphore_create(0);
-  response = NULL;
+  response = xpc_connection_send_message_with_reply_sync(conn, request);
 
-  xpc_connection_send_message_with_reply(conn, request,
-                                         dispatch_get_global_queue(0,0),
-					 ^(xpc_object_t reply)
-					 {
-					   /* Save the response and wake up */
-					   if (xpc_get_type(reply)
-					           == XPC_TYPE_DICTIONARY)
-					     response = xpc_retain(reply);
-
-					   dispatch_semaphore_signal(sem);
-					 });
-
-  dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
   xpc_release(request);
-  dispatch_release(sem);
 
   if (response)
   {
@@ -3368,24 +3352,8 @@ run_as_user(char       *argv[],		/* I - Command-line arguments */
   xpc_dictionary_set_int64(request, "command", kPMWaitForJob);
   xpc_dictionary_set_fd(request, "stderr", 2);
 
-  sem      = dispatch_semaphore_create(0);
-  response = NULL;
-
-  xpc_connection_send_message_with_reply(conn, request,
-                                         dispatch_get_global_queue(0,0),
-					 ^(xpc_object_t reply)
-					 {
-					   /* Save the response and wake up */
-					   if (xpc_get_type(reply)
-					           == XPC_TYPE_DICTIONARY)
-					     response = xpc_retain(reply);
-
-					   dispatch_semaphore_signal(sem);
-					 });
-
-  dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+  response = xpc_connection_send_message_with_reply_sync(conn, request);
   xpc_release(request);
-  dispatch_release(sem);
 
   if (response)
   {
