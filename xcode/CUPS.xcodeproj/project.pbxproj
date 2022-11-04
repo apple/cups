@@ -910,6 +910,7 @@
 		72D53A3C15B4930A003F877F /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E6136B64B000836530 /* Kerberos.framework */; };
 		72F75A5C1336F988004BB496 /* cupstestppd.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A5B1336F988004BB496 /* cupstestppd.c */; };
 		72F75A671336FA38004BB496 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
+		AAD8905329155D8C001DB4F9 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD8905229155D8C001DB4F9 /* UniformTypeIdentifiers.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -3620,6 +3621,7 @@
 		72F7F1D719D1C0CC00870B09 /* org.cups.usb-quirks */ = {isa = PBXFileReference; lastKnownFileType = text; name = "org.cups.usb-quirks"; path = "../backend/org.cups.usb-quirks"; sourceTree = "<group>"; };
 		72FC29CF1A37A1CA00BDF935 /* usb-libusb.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "usb-libusb.c"; path = "../backend/usb-libusb.c"; sourceTree = "<group>"; };
 		72FC29D01A37A1CA00BDF935 /* usb-unix.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "usb-unix.c"; path = "../backend/usb-unix.c"; sourceTree = "<group>"; };
+		AAD8905229155D8C001DB4F9 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -4218,6 +4220,7 @@
 				72D53A3C15B4930A003F877F /* Kerberos.framework in Frameworks */,
 				72D53A3115B4923F003F877F /* Security.framework in Frameworks */,
 				72D53A3215B4923F003F877F /* SystemConfiguration.framework in Frameworks */,
+				AAD8905329155D8C001DB4F9 /* UniformTypeIdentifiers.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5133,6 +5136,7 @@
 		72220FB113330B4A00FCA411 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AAD8905229155D8C001DB4F9 /* UniformTypeIdentifiers.framework */,
 				279AE6F42395B80F004DD600 /* libpam.tbd */,
 				2767FC591926750C000F61D3 /* CoreFoundation.framework */,
 				2767FC5A1926750C000F61D3 /* libiconv.dylib */,

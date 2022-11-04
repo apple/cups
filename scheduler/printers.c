@@ -17,6 +17,9 @@
 #ifdef HAVE_APPLICATIONSERVICES_H
 #  include <ApplicationServices/ApplicationServices.h>
 #endif /* HAVE_APPLICATIONSERVICES_H */
+#ifdef HAVE_UNIFORMTYPEIDENTIFIERS_H
+#  include <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
+#endif /* HAVE_UNIFORMTYPEIDENTIFIERS_H */
 #ifdef HAVE_SYS_MOUNT_H
 #  include <sys/mount.h>
 #endif /* HAVE_SYS_MOUNT_H */
@@ -4895,8 +4898,13 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
             CGImageRelease(biggestIconRef);
             if (closestTo128IconRef)
 	      CGImageRelease(closestTo128IconRef);
+#ifdef HAVE_UNIFORMTYPEIDENTIFIERS_H
+            destRef = CGImageDestinationCreateWithURL(outUrl, UTTypePNG, 1,
+                                                      NULL);
+#else
             destRef = CGImageDestinationCreateWithURL(outUrl, kUTTypePNG, 1,
                                                       NULL);
+#endif /* HAVE_UNIFORMTYPEIDENTIFIERS_H */
             if (destRef)
             {
               if (CGImageGetWidth(imageRef) != 128)

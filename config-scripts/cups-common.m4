@@ -344,6 +344,7 @@ case $host_os_name in
 		dnl Check for framework headers...
 		AC_CHECK_HEADER(ApplicationServices/ApplicationServices.h,AC_DEFINE(HAVE_APPLICATIONSERVICES_H))
 		AC_CHECK_HEADER(CoreFoundation/CoreFoundation.h,AC_DEFINE(HAVE_COREFOUNDATION_H))
+		AC_CHECK_HEADER(UniformTypeIdentifiers/UniformTypeIdentifiers.h,AC_DEFINE(HAVE_UNIFORMTYPEIDENTIFIERS_H))
 
 		dnl Check for dynamic store function...
 		SAVELIBS="$LIBS"
