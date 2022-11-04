@@ -131,8 +131,8 @@ _cups_md5_process(_cups_md5_state_t *pms, const unsigned char *data /*[64]*/)
     int i;
 
     for (i = 0; i < 16; ++i, xp += 4)
-	X[i] = (unsigned)xp[0] + ((unsigned)xp[1] << 8) +
-	       ((unsigned)xp[2] << 16) + ((unsigned)xp[3] << 24);
+	X[i] = (unsigned)xp[0] | ((unsigned)xp[1] << 8) |
+	       ((unsigned)xp[2] << 16) | ((unsigned)xp[3] << 24);
 
 #  else  /* !ARCH_IS_BIG_ENDIAN */
 
