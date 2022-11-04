@@ -2621,8 +2621,7 @@ load_ppds_dat(char   *filename,		/* I - Filename buffer */
       {
 	if ((ppd = (ppd_info_t *)calloc(1, sizeof(ppd_info_t))) == NULL)
 	{
-	  if (verbose)
-	    fputs("ERROR: [cups-driverd] Unable to allocate memory for PPD!\n",
+	  fputs("ERROR: [cups-driverd] Unable to allocate memory for PPD!\n",
 		  stderr);
 	  exit(1);
 	}
