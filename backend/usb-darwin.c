@@ -1128,7 +1128,7 @@ static void iterate_printers(iterator_callback_t callBack, void *userdata)
 
   iterator_reference_t reference = { callBack, userdata, true };
 
-  IONotificationPortRef addNotification = IONotificationPortCreate(kIOMasterPortDefault);
+  IONotificationPortRef addNotification = IONotificationPortCreate(kIOMainPortDefault);
 
   int printingClass = kUSBPrintingClass;
   int printingSubclass = kUSBPrintingSubclass;
