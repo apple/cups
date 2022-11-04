@@ -742,7 +742,7 @@ ippAttributeString(
           {
             unsigned year;		/* Year */
 
-            year = ((unsigned)val->date[0] << 8) + (unsigned)val->date[1];
+            year = ((unsigned)val->date[0] << 8) | (unsigned)val->date[1];
 
 	    if (val->date[9] == 0 && val->date[10] == 0)
 	      snprintf(temp, sizeof(temp), "%04u-%02u-%02uT%02u:%02u:%02uZ",

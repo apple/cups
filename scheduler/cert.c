@@ -434,9 +434,12 @@ ctcompare(const char *a,		/* I - First string */
     b ++;
   }
 
-  // either both *a and *b == '\0', or one points inside a string,
-  // so factor that in.
-  result |= (*a ^ *b);
+  /*
+  * The while loop finishes when *a == '\0' or *b == '\0'
+  * so after the while loop either both *a and *b == '\0',
+  * or one points inside a string, so when we apply bitwise OR on *a,
+  * *b and result, we get a non-zero return value if the compared strings don't match.
+  */
 
-  return (result);
+  return (result | *a | *b);
 }
