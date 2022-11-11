@@ -65,7 +65,7 @@ cupsBackChannelRead(char   *buffer,	/* I - Buffer to read into */
   }
   while (status < 0 && errno != EINTR && errno != EAGAIN);
 
-  if (status < 0)
+  if (status <= 0)
     return (-1);			/* Timeout! */
 
  /*
@@ -173,8 +173,8 @@ cups_setup(fd_set         *set,		/* I - Set for select() */
            struct timeval *tval,	/* I - Timer value */
 	   double         timeout)	/* I - Timeout in seconds */
 {
-  tval->tv_sec = (int)timeout;
-  tval->tv_usec = (int)(1000000.0 * (timeout - tval->tv_sec));
+  tval->tv_sec = (time_t)timeout;
+  tval->tv_usec = (suseconds_t)(1000000.0 * (timeout - tval->tv_sec));
 
   FD_ZERO(set);
   FD_SET(3, set);
