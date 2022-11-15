@@ -219,7 +219,7 @@ cupsMakeServerCredentials(
   cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name, kCFStringEncodingUTF8);
   if (!cfcommon_name)
   {
-    DEBUG_puts("1cupsMakeServerCredentials: Unable to create CF string of common name.");
+    DEBUG_puts("1cupsMakeServerCredentials: Unable to create a CFString of common name.");
     goto cleanup;
   }
 
@@ -430,9 +430,8 @@ httpCopyCredentials(
   OSStatus		error;		/* Error code */
   SecTrustRef		peerTrust;	/* Peer trust reference */
   CFIndex		count;		/* Number of credentials */
-  SecCertificateRef	secCert;	/* Certificate reference */
   CFDataRef		data;		/* Certificate data */
-  int			i;		/* Looping var */
+  CFIndex		i;		/* Looping var */
 
 
   DEBUG_printf(("httpCopyCredentials(http=%p, credentials=%p)", (void *)http, (void *)credentials));
@@ -449,11 +448,12 @@ httpCopyCredentials(
 
     if ((*credentials = cupsArrayNew(NULL, NULL)) != NULL)
     {
-      count = SecTrustGetCertificateCount(peerTrust);
-
+      CFArrayRef secArray = SecTrustCopyCertificateChain(peerTrust);
+      count = CFArrayGetCount(secArray);
+      
       for (i = 0; i < count; i ++)
       {
-	secCert = SecTrustGetCertificateAtIndex(peerTrust, i);
+        const SecCertificateRef secCert = CFArrayGetValueAtIndex(secArray, i);
 
 #ifdef DEBUG
         CFStringRef cf_name = SecCertificateCopySubjectSummary(secCert);
@@ -463,17 +463,18 @@ httpCopyCredentials(
 	else
 	  strlcpy(name, "unknown", sizeof(name));
 
-	DEBUG_printf(("2httpCopyCredentials: Certificate %d name is \"%s\".", i, name));
+	DEBUG_printf(("2httpCopyCredentials: Certificate %ld name is \"%s\".", (long)i, name));
 #endif /* DEBUG */
 
 	if ((data = SecCertificateCopyData(secCert)) != NULL)
 	{
-	  DEBUG_printf(("2httpCopyCredentials: Adding %d byte certificate blob.", (int)CFDataGetLength(data)));
+	  DEBUG_printf(("2httpCopyCredentials: Adding %ld byte certificate blob.", (long)CFDataGetLength(data)));
 
 	  httpAddCredential(*credentials, CFDataGetBytePtr(data), (size_t)CFDataGetLength(data));
 	  CFRelease(data);
 	}
       }
+      CFRelease(secArray);
     }
 
     CFRelease(peerTrust);
