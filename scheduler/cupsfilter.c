@@ -1126,7 +1126,7 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
       close(filterfds[1 - current][1]);
 
       filterfds[1 - current][0] = -1;
-      filterfds[1 - current][0] = -1;
+      filterfds[1 - current][1] = -1;
     }
 
     if (next)
