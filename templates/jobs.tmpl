@@ -8,7 +8,7 @@
 <TR VALIGN="TOP">
 <TD><A HREF="{job_printer_uri}">{job_printer_name}</A>-{job_id}{?phone? ({phone}):}&nbsp;</TD>
 <TD>{?job_name=?Unknown:{job_name}}&nbsp;</TD>
-<TD>{?job_originating_user_name=?Withheld:{job_originating_user_name}}&nbsp;</TD>
+<TD>{?job_originating_user_name=?Withheld:{job_originating_user_name}} @ {job_originating_host_name}&nbsp;</TD>
 <TD>{job_k_octets}k&nbsp;</TD>
 <TD>{job_impressions_completed=0?Unknown:{?job_impressions_completed}}&nbsp;</TD>
 <TD>{job_state=3?pending since<BR>{?time_at_creation=?Unknown:{time_at_creation}}:{job_state=4?held since<BR>{?time_at_creation=?Unknown:{time_at_creation}}:
