@@ -1141,7 +1141,7 @@ _cupsGetDestResource(
   DEBUG_printf(("1_cupsGetDestResource: device-uri=\"%s\", printer-uri-supported=\"%s\".", device_uri, printer_uri));
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-  if (((flags & CUPS_DEST_FLAGS_DEVICE) || !printer_uri) && strstr(device_uri, "._tcp"))
+  if (((flags & CUPS_DEST_FLAGS_DEVICE) || !printer_uri) && device_uri && strstr(device_uri, "._tcp"))
   {
     if ((device_uri = cups_dnssd_resolve(dest, device_uri, 5000, NULL, NULL, NULL)) != NULL)
     {
