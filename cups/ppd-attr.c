@@ -170,6 +170,14 @@ _ppdNormalizeMakeAndModel(
     if ((bufptr = strrchr(buffer, ')')) != NULL)
       *bufptr = '\0';
   }
+  else if (!_cups_strncasecmp(make_and_model, "Xprinter", 8))
+  {
+   /*
+    * Xprinter...
+    */
+
+    snprintf(buffer, bufsize, "%s", make_and_model);
+  }
   else if (!_cups_strncasecmp(make_and_model, "XPrint", 6))
   {
    /*
