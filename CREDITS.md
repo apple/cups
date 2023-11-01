@@ -16,7 +16,7 @@ to thank the following individuals for their contributions:
                                      fixes.
     Bjoern Jacke                   - I18N stuff.
     Wang Jian                      - CUPS RPM corrections.
-    Roderick Johnstone             - Beta tester of the millenium.
+    Roderick Johnstone             - Beta tester of the millennium.
     Till Kamppeter                 - Bug fixes, beta testing, evangelism.
     Tomohiro Kato                  - Japanese localization.
     Kiko                           - Bug fixes.

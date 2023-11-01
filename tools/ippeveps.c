@@ -297,7 +297,7 @@ dsc_header(int num_pages)		/* I - Number of pages or 0 if not known */
  */
 
 static void
-dsc_page(int page)			/* I - Page numebr (1-based) */
+dsc_page(int page)			/* I - Page number (1-based) */
 {
   printf("%%%%Page: (%d) %d\n", page, page);
 
@@ -541,7 +541,7 @@ jpeg_to_ps(const char    *filename,	/* I - Filename */
   float		page_left,		/* Left margin */
 		page_top,		/* Top margin */
 		page_width,		/* Page width in points */
-		page_height,		/* Page heigth in points */
+		page_height,		/* Page height in points */
 		x_factor,		/* X image scaling factor */
 		y_factor,		/* Y image scaling factor */
 		page_scaling;		/* Image scaling factor */

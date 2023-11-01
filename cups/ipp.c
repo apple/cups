@@ -1929,7 +1929,7 @@ ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP message */
                      const char *name,	/* I - Name of attribute */
 		     ipp_tag_t  type)	/* I - Type of attribute */
 {
-  ipp_attribute_t	*attr,		/* Current atttribute */
+  ipp_attribute_t	*attr,		/* Current attribute */
 			*childattr;	/* Child attribute */
   ipp_tag_t		value_tag;	/* Value tag */
   char			parent[1024],	/* Parent attribute name */

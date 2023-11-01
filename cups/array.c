@@ -1098,7 +1098,7 @@ cups_array_add(cups_array_t *a,		/* I - Array */
     else if (!diff)
     {
      /*
-      * Compared equal, make sure we add to the begining or end of
+      * Compared equal, make sure we add to the beginning or end of
       * the current run of equal elements...
       */
 
@@ -1240,7 +1240,7 @@ cups_array_find(cups_array_t *a,	/* I - Array */
       else
       {
        /*
-        * Start wih previous on left side...
+        * Start with previous on left side...
 	*/
 
         left  = prev;

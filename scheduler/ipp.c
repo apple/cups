@@ -10080,7 +10080,7 @@ send_ipp_status(cupsd_client_t *con,	/* I - Client connection */
 	        ...)			/* I - Additional args as needed */
 {
   va_list	ap;			/* Pointer to additional args */
-  char		formatted[1024];	/* Formatted errror message */
+  char		formatted[1024];	/* Formatted error message */
 
 
   va_start(ap, message);

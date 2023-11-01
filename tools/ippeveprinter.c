@@ -5844,7 +5844,7 @@ process_client(ippeve_client_t *client)	/* I - Client */
   }
 
  /*
-  * Close the conection to the client and return...
+  * Close the connection to the client and return...
   */
 
   delete_client(client);
@@ -7613,7 +7613,7 @@ respond_ipp(ippeve_client_t *client,	/* I - Client */
 static void
 respond_unsupported(
     ippeve_client_t   *client,		/* I - Client */
-    ipp_attribute_t *attr)		/* I - Atribute */
+    ipp_attribute_t *attr)		/* I - Attribute */
 {
   ipp_attribute_t	*temp;		/* Copy of attribute */
 

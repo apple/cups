@@ -3480,7 +3480,7 @@ ppdcSource::write_file(const char *f)	// I - File to write
                    d->model_name->value);
     cupsFilePuts(fp, "{\n");
 
-    // Write the copyright stings...
+    // Write the copyright strings...
     for (st = (ppdcString *)d->copyright->first();
          st;
 	 st = (ppdcString *)d->copyright->next())

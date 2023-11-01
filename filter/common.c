@@ -206,7 +206,7 @@ UpdatePageVars(void)
 
   switch (Orientation & 3)
   {
-    case 0 : /* Portait */
+    case 0 : /* Portrait */
         break;
 
     case 1 : /* Landscape */
