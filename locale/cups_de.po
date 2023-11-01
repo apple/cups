@@ -71,7 +71,7 @@ msgid "\tDefault page size:"
 msgstr "\tVoreingestellte Seitengrösse:"
 
 msgid "\tDefault pitch:"
-msgstr "\tVoreingestellte Neigung:"
+msgstr "\tVoreingestellte Gradation:"
 
 msgid "\tDefault port settings:"
 msgstr "\tVoreingestellte Porteinstellungen:"
@@ -92,7 +92,7 @@ msgstr "\tSchnittstelle: %s.ppd"
 
 #, c-format
 msgid "\tInterface: %s/ppd/%s.ppd"
-msgstr "\tSchnittstelle: %s/ppp/%s.ppd"
+msgstr "\tSchnittstelle: %s/ppd/%s.ppd"
 
 #, c-format
 msgid "\tLocation: %s"
