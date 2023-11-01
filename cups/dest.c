@@ -230,6 +230,7 @@ static int		cups_find_dest(const char *name, const char *instance,
 static int              cups_get_cb(_cups_getdata_t *data, unsigned flags, cups_dest_t *dest);
 static char		*cups_get_default(const char *filename, char *namebuf,
 					  size_t namesize, const char **instance);
+static char		*cups_get_printer_list(const char *filename, char *namebuf, size_t namesize);
 static int		cups_get_dests(const char *filename, const char *match_name, const char *match_inst, int load_all, int user_default_set, int num_dests, cups_dest_t **dests);
 static char		*cups_make_string(ipp_attribute_t *attr, char *buffer,
 			                  size_t bufsize);
@@ -1441,6 +1442,12 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
     ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type-mask", (int)mask);
   }
 
+  if (name)
+  {
+    ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "limit", 1);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "first-printer-name", NULL, name);
+  }
+
  /*
   * Do the request and get back a response...
   */
@@ -1562,6 +1569,16 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
       */
 
       if (!printer_name)
+      {
+        cupsFreeOptions(num_options, options);
+
+        if (attr == NULL)
+	  break;
+	else
+          continue;
+      }
+
+      if (name && printer_name && strcmp(name, printer_name) != 0)
       {
         cupsFreeOptions(num_options, options);
 
@@ -3384,8 +3401,10 @@ cups_enum_dests(
   void           *user_data)            /* I - User data */
 {
   int           i, j, k,		/* Looping vars */
-                num_dests;              /* Number of destinations */
+                num_dests,              /* Number of destinations */
+                tmp_num_dests;          /* Number of destinations */
   cups_dest_t   *dests = NULL,          /* Destinations */
+                *tmp_dests = NULL,      /* Destinations */
                 *dest;			/* Current destination */
   cups_option_t	*option;		/* Current option */
   const char	*user_default;		/* Default printer from environment */
@@ -3421,6 +3440,11 @@ cups_enum_dests(
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
   char		filename[1024];		/* Local lpoptions file */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+  char		printer_list[1024];	/* List of desired printers */
+  char          *token = NULL;
+  char          *rest = NULL;
+  char          *saveptr = NULL;
 
 
   DEBUG_printf(("cups_enum_dests(flags=%x, msec=%d, cancel=%p, type=%x, mask=%x, cb=%p, user_data=%p)", flags, msec, (void *)cancel, type, mask, (void *)cb, (void *)user_data));
@@ -3504,7 +3528,33 @@ cups_enum_dests(
     * Get the list of local printers and pass them to the callback function...
     */
 
-    num_dests = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, &dests, type, mask);
+   /* Get a list from the user to see which printers should be visible */
+    rest = getenv("CUPS_PRINTER_LIST");
+    if (!rest) rest = cups_get_printer_list(filename, printer_list, sizeof(printer_list));
+
+    if (rest && (strlen(rest) > 0))
+    {
+	/* Make a copy of the list and tokenize it; then check each printter in the list
+	 * whether it exists
+	 */
+        rest = strdup(rest);
+        num_dests = 0;
+        while ((token = strtok_r(rest, ", ", &saveptr)))
+        {
+             rest = NULL;
+             tmp_dests = NULL;
+             tmp_num_dests = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, token, &tmp_dests, type, mask);
+             if (tmp_num_dests == 1)
+             {
+                 cupsCopyDest(tmp_dests, num_dests++, &dests);
+             }
+             cupsFreeDests(tmp_num_dests, tmp_dests);
+        }
+    }
+    else
+    {
+        num_dests = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, &dests, type, mask);
+    }
 
     if (data.def_name[0])
     {
@@ -4089,6 +4139,48 @@ cups_get_default(const char *filename,	/* I - File to read */
 	  *nameptr++ = '\0';
 
         *instance = nameptr;
+	break;
+      }
+    }
+
+    cupsFileClose(fp);
+  }
+
+  return (*namebuf ? namebuf : NULL);
+}
+
+
+/*
+ * 'cups_get_printer_list()' - Get the list of desired printers from an lpoptions file.
+ */
+
+static char *				/* O - Default destination or NULL */
+cups_get_printer_list(const char *filename,	/* I - File to read */
+		      char       *namebuf,	/* I - Name buffer */
+		      size_t     namesize)	/* I - Size of name buffer */
+{
+  cups_file_t	*fp;			/* lpoptions file */
+  char		line[8192],		/* Line from file */
+		*value,			/* Value for line */
+		*nameptr;		/* Pointer into name */
+  int		linenum;		/* Current line */
+
+
+  *namebuf = '\0';
+
+  if ((fp = cupsFileOpen(filename, "r")) != NULL)
+  {
+    linenum  = 0;
+
+    while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
+    {
+      if (!_cups_strcasecmp(line, "printer-list") && value)
+      {
+        strlcpy(namebuf, value, namesize);
+
+	if ((nameptr = strchr(namebuf, '\t')) != NULL)
+	  *nameptr = ' ';
+
 	break;
       }
     }
