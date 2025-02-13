@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="stylesheet" href="/cups.css" type="text/css">
+    <link rel="shortcut icon" href="/apple-touch-icon.png" type="image/png">
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta name="viewport" content="width=device-width">
+    <title>Hem - CUPS @CUPS_VERSION@</title>
+  </head>
+  <body>
+    <div class="cups-header">
+      <ul>
+	<li><a href="https://openprinting.github.io/cups/" target="_blank">OpenPrinting CUPS</a></li>
+	<li><a class="active" href="/">Hem</a></li>
+	<li><a href="/admin">Administration</a></li>
+	<li><a href="/classes/">Klasser</a></li>
+	<li><a href="/help/">Hjälp</a></li>
+	<li><a href="/jobs/">Jobb</a></li>
+	<li><a href="/printers/">Skrivare</a></li>
+      </ul>
+    </div>
+    <div class="cups-body">
+      <div class="row">
+	<h1>CUPS @CUPS_VERSION@</h1>
+	<p>Det standardbaserade utskriftssystemet med öppen källkod som utvecklats av <a class="jumbolink" href="https://openprinting.github.io/" target="_blank">OpenPrinting</a> för Linux® och andra Unix<sup>&reg;</sup>-liknande operativsystem. CUPS använder <a href="https://www.pwg.org/ipp/everywhere.html" target="_blank">IPP Everywhere™</a> för att ge stöd för utskrifter till lokala skrivare och nätverksskrivare.</p>
+      </div>
+      <div class="row">
+	<div class="thirds">
+	  <h2>CUPS för användare</h2>
+	  <p><a href="help/overview.html">Översikt över CUPS</a></p>
+	  <p><a href="help/options.html">Utskrift och alternativ på kommandoraden</a></p>
+	</div>
+	<div class="thirds">
+	  <h2>CUPS för administratörer</h2>
+	  <p><a href="help/admin.html">Lägga till skrivare och klasser</a></p>
+	  <p><a href="help/policies.html">Hantera driftspolicy</a></p>
+	  <p><a href="help/network.html">Använda nätverksskrivare</a></p>
+	  <p><a href="help/firewalls.html">Brandväggar</a></p>
+	  <p><a href="help/man-cupsd.conf.html">Referens för cupsd.conf</a></p>
+	</div>
+	<div class="thirds">
+	  <h2>CUPS för utvecklare</h2>
+	  <p><a href="help/cupspm.html">Programmeringsmanual för CUPS</a></p>
+	  <p><a href="help/api-filter.html">Programmering av filter och backend</a></p>
+	</div>
+      </div>
+    </div>
+    <div class="cups-footer">Copyright &copy; 2021-2023 OpenPrinting. All rights reserved.</div>
+  </body>
+</html>

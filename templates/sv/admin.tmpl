@@ -1,0 +1,77 @@
+<div class="row">
+  <div class="halves">
+    <H2 CLASS="title">Skrivare</H2>
+
+    <P>
+    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="Lägg till skrivare"></FORM>
+    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="Hitta nya skrivare"></FORM>
+    <FORM ACTION="/printers/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Hantera skrivare"></FORM>
+    </P>
+
+    <H2 CLASS="title">Klasser</H2>
+
+    <P>
+    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-class"><INPUT TYPE="SUBMIT" VALUE="Lägg till klass"></FORM>
+    <FORM ACTION="/classes/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Hantera klasser"></FORM>
+    </P>
+
+    <H2 CLASS="title">Jobb</H2>
+
+    <P>
+    <FORM ACTION="/jobs/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Hantera jobb"></FORM>
+    </P>
+  </div>
+  <div class="halves">
+    <H2 CLASS="title">Server</H2>
+
+    <P>
+    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server"><INPUT TYPE="SUBMIT" VALUE="Redigera konfigurationsfil"></FORM>
+    </P>
+
+    {SETTINGS_ERROR?<P>{SETTINGS_MESSAGE}</P>
+    <BLOCKQUOTE>{SETTINGS_ERROR}</BLOCKQUOTE>:
+
+    <FORM METHOD="POST" ACTION="/admin">
+    <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+
+    {ADVANCEDSETTINGS?<P><B>Serverinställningar\:</B></P>
+
+    <P><A HREF="/admin/">Avancerat <SMALL>&#x25bc;</SMALL></A><BR>
+    <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+    <INPUT TYPE="HIDDEN" NAME="ADVANCEDSETTINGS" VALUE="CHECKED">
+    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" ID="SHARE_PRINTERS" VALUE="CHECKED" {?share_printers}><LABEL FOR="SHARE_PRINTERS"> Dela skrivare anslutna till detta system</LABEL><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Max klienter\:
+    <INPUT TYPE="TEXT" NAME="MAX_CLIENTS" VALUE="{?max_clients}" SIZE="6"><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" ID="REMOTE_ANY" VALUE="CHECKED" {?remote_any}><LABEL FOR="REMOTE_ANY">  Tillåt utskrifter från Internet</LABEL><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="BROWSE_WEB_IF" ID="BROWSE_WEB_IF" VALUE="CHECKED" {?browse_web_if}><LABEL FOR="BROWSE_WEB_IF">  Annonsera webbgränssnitt</LABEL><BR>
+    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" ID="REMOTE_ADMIN" VALUE="CHECKED" {?remote_admin}><LABEL FOR="REMOTE_ADMIN">  Tillåt fjärradministration</LABEL><BR>
+    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" ID="KERBEROS" VALUE="CHECKED" {?kerberos}><LABEL FOR="KERBEROS"> Använd Kerberos-autentisering (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)</LABEL><BR>:}
+    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" ID="USER_CANCEL_ANY" VALUE="CHECKED" {?user_cancel_any}><LABEL FOR="USER_CANCEL_ANY">  Tillåt användare att avbryta alla jobb (inte bara sina egna)</LABEL><BR>
+    <INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOBS" ID="PRESERVE_JOBS" VALUE="CHECKED" {?preserve_jobs}><LABEL FOR="PRESERVE_JOBS">   Bevara jobbhistorik</LABEL><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Maximalt antal jobb (0 för ingen begränsning)\:
+    <INPUT TYPE="TEXT" NAME="MAX_JOBS" VALUE="{?max_jobs}" SIZE="6"><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Behåll metadata\:
+    <INPUT TYPE="TEXT" NAME="PRESERVE_JOB_HISTORY" VALUE="{?preserve_job_history}" SIZE="6"><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Behåll dokument\:
+    <INPUT TYPE="TEXT" NAME="PRESERVE_JOB_FILES" VALUE="{?preserve_job_files}" SIZE="6"><BR>
+    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" ID="DEBUG_LOGGING" VALUE="CHECKED" {?debug_logging}><LABEL FOR="DEBUG_LOGGING">  Spara felsökningsinformation för felsökning</LABEL><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Max loggfilsstorlek\:
+    <INPUT TYPE="TEXT" NAME="MAX_LOG_SIZE" VALUE="{?max_log_size}" SIZE="6"></P>
+
+    :<P><B>Serverinställningar:</B></P>
+
+    <P><A HREF="/admin/?ADVANCEDSETTINGS=YES">Avancerat <SMALL>&#x25b6;</SMALL></A><BR>
+    <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" ID="SHARE_PRINTERS" VALUE="CHECKED" {?share_printers}><LABEL FOR="SHARE_PRINTERS"> Dela skrivare som är anslutna till det här systemet</LABEL><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" ID="REMOTE_ANY" VALUE="CHECKED" {?remote_any}><LABEL FOR="REMOTE_ANY">  Tillåt utskrifter från Internet</LABEL><BR>
+    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" ID="REMOTE_ADMIN" VALUE="CHECKED" {?remote_admin}><LABEL FOR="REMOTE_ADMIN">  Tillåt fjärradministration</LABEL><BR>
+    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" ID="KERBEROS" VALUE="CHECKED" {?kerberos}><LABEL FOR="KERBEROS">  Använd Kerberos-autentisering (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)</LABEL><BR>:}
+    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" ID="USER_CANCEL_ANY" VALUE="CHECKED" {?user_cancel_any}><LABEL FOR="USER_CANCEL_ANY">  Tillåt användare att avbryta alla jobb (inte bara sina egna)</LABEL><BR>
+    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" ID="DEBUG_LOGGING" VALUE="CHECKED" {?debug_logging}><LABEL FOR="DEBUG_LOGGING">  Spara felsökningsinformation för felsökning</LABEL></P>
+
+    }
+    <P><INPUT TYPE="SUBMIT" NAME="CHANGESETTINGS" VALUE="Ändra inställningar"></P>
+
+    </FORM>}
+  </div>
+</div>

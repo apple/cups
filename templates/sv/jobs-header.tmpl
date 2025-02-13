@@ -1,0 +1,5 @@
+{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Visa aktiva jobb"></FORM>}
+{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completed"><INPUT TYPE="SUBMIT" VALUE="Visa färdiga jobb"></FORM>}
+{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="Visa alla jobb"></FORM>}
+
+<P ALIGN="CENTER">{?which_jobs=?Aktiva jobb listade i bearbetningsordning▼; kvarhållna jobb visas först.:{which_jobs=all?Jobb i ordningsföljd▼:Färdiga jobb i ordning efter färdiga eller avbrutna▲}}</P>

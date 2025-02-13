@@ -1,0 +1,14 @@
+<H2 CLASS="title">Lägg till skrivare {printer_name}</H2>
+
+<P>Skrivaren <A HREF="/printers/{printer_name}">{printer_name}</A> har lagts till.
+
+<blockquote>
+<b>Obs:</b> Skrivardrivrutiner och råa köer är föråldrade och kommer att sluta fungera i en framtida version av CUPS.
+</blockquote>
+
+<FORM ACTION="admin/" METHOD="POST">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="set-printer-options">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<INPUT TYPE="SUBMIT" VALUE="Ställ in skrivaralternativ">
+</FORM>

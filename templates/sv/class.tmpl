@@ -1,0 +1,41 @@
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?Overksam:{printer_state=4?Behandlar:Pausad}},
+{printer_is_accepting_jobs=0?Nekar jobb:Accepterar jobb},
+{server_is_sharing_printers=0?Inte:{printer_is_shared=0?Inte:}} Delad{default_name={printer_name}?, Serverstandard:})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Underhåll</OPTION>
+<OPTION VALUE="print-test-page">Skriv ut testsida</OPTION>
+{printer_state=5?<OPTION VALUE="start-class">Återuppta klass</OPTION>:<OPTION VALUE="stop-class">Pausa klass</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Acceptera jobb</OPTION>:<OPTION VALUE="reject-jobs">Neka jobb</OPTION>}
+<OPTION VALUE="move-jobs">Flytta alla jobb</OPTION>
+<OPTION VALUE="cancel-jobs">Avbryt alla jobb</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Kör" STYLE="display: none;">
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<INPUT TYPE="HIDDEN" NAME="IS_CLASS" VALUE="1">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Administration</OPTION>
+<OPTION VALUE="modify-class">Ändra klass</OPTION>
+<OPTION VALUE="delete-class">Ta bort klass</OPTION>
+<OPTION VALUE="set-class-options">Ställ in standardalternativ</OPTION>
+<OPTION VALUE="set-as-default">Ställ in som serverstandard</OPTION>
+<OPTION VALUE="set-allowed-users">Ställ in tillåtna användare</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Kör" STYLE="display: none;">
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Beskrivning:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Plats:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Medlemmar:</TH><TD>{?member_uris=?None:{member_uris}}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Standardvärden:</TH><TD>job-sheets={job_sheets_default}
+media={media_default?{media_default}:unknown}
+{sides_default?sides={sides_default}:}</TD></TR>
+</TABLE>
