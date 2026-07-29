@@ -10,7 +10,7 @@
 <!--
   IPP specification for CUPS.
 
-  Copyright © 2007-2016 by Apple Inc.
+  Copyright © 2007-2023 by Apple Inc.
   Copyright © 1997-2007 by Easy Software Products.
 
   Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -1886,6 +1886,76 @@ CUPS-Get-PPDs Response:
 <h4>printer-type-mask (type2 enum)<span class='info'>CUPS 1.1</span></h4>
 
 <p>The "printer-type-mask" attribute is used to choose printers or classes with the CUPS-Get-Printers and CUPS-Get-Classes operations. The bits are defined identically to the printer-type attribute and default to all 1's.
+</p>
+
+<h4>printer-wifi-password (octetString(MAX))</h4>
+
+<p>The optional "printer-wifi-password" description attribute provides the wireless network password for a printer.
+Printers must not return this attribute in the response to a Get-Printer-Attributes request.
+This attribute can only be set via an authenticated Set-Printer-Attributes request over a secure channel,
+or via an unauthenticated IPP USB connection when the printer is in its initial setup state.
+When a value for this attribute is not set, the 'wifi-not-configured-report' keyword must be present in the
+"printer-state-reasons" printer attribute values. If a printer supports this attribute, it must also support
+the "printer-wifi-ssid" and "printer-wifi-state" attributes.</p>
+
+<h4>printer-wifi-ssid (name(MAX))</h4>
+
+<p>The optional "printer-wifi-ssid" description attribute specifies the wireless network name for the printer.
+When set to the empty string, the printer must not join infrastructure or ad-hoc networks.
+This attribute can only be set via an authenticated Set-Printer-Attributes request over a secure channel,
+or via an unauthenticated IPP USB connection when the printer is in its initial setup state.
+This attribute also must reflect any configuration done by the user through the printer's web interface,
+control panel, or other interface. When a value for this attribute is not set, the 'wifi-not-configured-report'
+keyword must be present in the "printer-state-reasons" printer attribute values.
+If a printer supports this attribute, it must also support the "printer-wifi-password" and
+"printer-wifi-state" attributes.</p>
+
+<p>Printers that support the Set-Printer-Attribtes operation and "printer-wifi-password" and "printer-wifi-ssid"
+printer description attributes must also support unauthenticated Set-Printer-Attributes requests over USB when Wi-Fi
+networking has not yet been configured. This allows a client to configure the Wi-Fi networking of a printer over USB.</p>
+
+<p>When configuring a wireless network, clients must send both the "printer-wifi-ssid" and "printer-wifi-password"
+printer description attributes. If only one attribute is supplied, the printer must reject the request with the
+client-error-bad-request status code. If either attribute is supplied with an invalid value,
+the printer must reject the request with the client-error-attributes-or-values-not-supported status code.</p>
+
+In addition to other defined printer-state-reasons, the 'wifi-not-configured-report' reason is returned when the
+"printer-wifi-password" and "printer-wifi-ssid" printer description attributes are not set,
+regardless of the value of the "printer-wifi-state" printer status attribute.
+
+<h4>printer-wifi-state (type2 enum)</h4>
+
+<p>The optional "printer-wifi-state" status attribute specifies a printer's current wireless network state as
+an enumerated value. The following values are currently defined:</p>
+
+<div class='table'><table align='center' border='1' width='80%' summary='Wireless Networking State'>
+<tbody>
+<tr>
+	<td>3</td>
+	<td>(off) wireless networking is turned off</td>
+</tr>
+<tr>
+	<td>4</td>
+	<td>(not-configured) wireless networking is not yet configured</td>
+</tr>
+<tr>
+	<td>5</td>
+	<td>(not-visible) the configured wireless network is not visible</td>
+</tr>
+<tr>
+	<td>6</td>
+	<td>(cannot-join) unable to join the configured wireless network</td>
+</tr>
+<tr>
+	<td>7</td>
+	<td>(joining) joining the configured wireless network</td>
+</tr>
+<tr>
+	<td>8</td>
+	<td>(on) joined to the configured wireless network</td>
+</tr>
+</tbody>
+</table></div>
 
 <h4>requesting-user-name-allowed (1setof name(127))<span class='info'>CUPS 1.1</span></h4>
 
